@@ -492,19 +492,125 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
 .scroll-cta:hover{transform:scale(1.12);}
 .scroll-cta:hover::before{animation:none;opacity:0;}
 </style>
+<style>
+  /* ===== Cotizacion compartida (vista publica dentro de esta misma pagina) ===== */
+  body.quote-view-mode > *:not(#sharedQuoteView){ display:none !important; }
+  #sharedQuoteView{ display:none; min-height:100vh; background:linear-gradient(165deg,#06070A 0%,#06038D 140%); padding:40px 16px 60px; }
+  body.quote-view-mode #sharedQuoteView{ display:block; }
+  #sharedQuoteView .sqv-wrap{ max-width:850px; margin:0 auto; }
+  #sharedQuoteView .sqv-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+  #sharedQuoteView .sqv-brand{ display:flex; align-items:center; gap:10px; }
+  #sharedQuoteView .sqv-mark{ width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#5B54FF,#3B36D6);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+  #sharedQuoteView .sqv-word{ font-family:'Unbounded',Arial,sans-serif; font-weight:800; font-size:16px; color:#fff; letter-spacing:-0.2px; }
+  #sharedQuoteView .sqv-actions{ display:flex; gap:10px; }
+  #sharedQuoteView .sqv-btn{ font:700 13px Arial,sans-serif; padding:9px 18px; border-radius:8px; cursor:pointer; border:1.5px solid rgba(255,255,255,.35); background:transparent; color:#fff; text-decoration:none; display:inline-flex; align-items:center; }
+  #sharedQuoteView .sqv-btn.primary{ background:#5B54FF; border-color:#5B54FF; }
+  #sharedQuoteView .sqv-loading, #sharedQuoteView .sqv-error{ color:#C9C6FF; text-align:center; padding:80px 20px; font-size:14px; }
+
+  #sharedQuoteView #sqvMount{ background:#fff; border-radius:12px; padding:40px 50px; font-size:13px; color:#06038D; max-width:850px; margin:0 auto; }
+  #sharedQuoteView .doc-header{ display:flex; align-items:center; justify-content:center; gap:18px; border-bottom:1px solid #D6D3FF; padding-bottom:14px; margin-bottom:14px; }
+  #sharedQuoteView .doc-header img{ width:64px; height:64px; }
+  #sharedQuoteView .doc-header h1{ font-family:'Unbounded',Arial,sans-serif; font-weight:800; font-size:40px; letter-spacing:-1px; color:#06038D; }
+  #sharedQuoteView .doc-title{ text-align:center; font-size:18px; color:#5B54FF; font-weight:700; margin-bottom:18px; letter-spacing:1px; }
+  #sharedQuoteView .doc-meta{ display:flex; justify-content:space-between; border-top:2px solid #06038D; border-bottom:1px solid #D6D3FF; padding:12px 0; margin-bottom:18px; }
+  #sharedQuoteView .doc-meta .label{ font-size:11px; color:#7c8aa6; letter-spacing:1px; }
+  #sharedQuoteView .doc-meta .value{ font-size:13px; font-weight:700; color:#06038D; }
+  #sharedQuoteView .doc-section{ font-size:13px; letter-spacing:1px; color:#06038D; border-bottom:1px solid #D6D3FF; padding-bottom:6px; margin:22px 0 10px; text-transform:uppercase; font-weight:700; }
+  #sharedQuoteView table.doc-client{ width:100%; border-collapse:collapse; }
+  #sharedQuoteView table.doc-client td{ background:#F1F0FF; padding:8px 12px; font-size:13px; }
+  #sharedQuoteView table.doc-client td.label{ color:#7c8aa6; font-size:11px; letter-spacing:1px; width:160px; font-weight:700; vertical-align:top; }
+  #sharedQuoteView table.doc-product{ width:100%; border-collapse:collapse; margin-top:6px; }
+  #sharedQuoteView table.doc-product th{ background:#06038D; color:#fff; text-align:left; padding:8px 12px; font-size:11px; letter-spacing:1px; }
+  #sharedQuoteView table.doc-product th.num, #sharedQuoteView table.doc-product td.num{ text-align:right; }
+  #sharedQuoteView table.doc-product td{ padding:8px 12px; border-bottom:1px solid #D6D3FF; font-size:13px; }
+  #sharedQuoteView ul.doc-list{ list-style:none; padding-left:4px; }
+  #sharedQuoteView ul.doc-list li{ font-size:12.5px; padding:2px 0 2px 14px; text-indent:-14px; }
+  #sharedQuoteView ul.doc-list li::before{ content:"\2022"; color:#5B54FF; font-weight:700; display:inline-block; width:14px; text-indent:0; }
+  #sharedQuoteView table.doc-pricing{ width:100%; margin-top:8px; border-collapse:collapse; }
+  #sharedQuoteView table.doc-pricing td{ padding:6px 12px; font-size:13px; text-align:right; }
+  #sharedQuoteView table.doc-pricing td.label{ text-align:right; color:#5b6b8c; width:70%; }
+  #sharedQuoteView table.doc-pricing tr.total td{ font-weight:800; font-size:15px; color:#06038D; border-top:2px solid #06038D; background:#F1F0FF; }
+  #sharedQuoteView .doc-note{ background:#F1F0FF; border-left:4px solid #06038D; padding:10px 14px; margin:12px 0; font-size:12.5px; }
+  #sharedQuoteView .doc-note b{ display:block; margin-bottom:4px; color:#06038D; }
+  #sharedQuoteView .doc-signatures{ display:flex; justify-content:space-between; margin-top:60px; }
+  #sharedQuoteView .doc-sig{ width:45%; border-top:1px solid #06038D; padding-top:6px; font-size:11px; color:#7c8aa6; text-align:center; }
+  #sharedQuoteView .doc-footer{ text-align:center; padding-top:24px; margin-top:30px; border-top:1px solid #D6D3FF; font-size:11px; color:#5b6b8c; }
+  #sharedQuoteView .doc-footer b{ color:#06038D; }
+
+  @media print{
+    body.quote-view-mode > *:not(#sharedQuoteView){ display:none !important; }
+    #sharedQuoteView{ background:#fff !important; padding:0 !important; }
+    #sharedQuoteView .sqv-top{ display:none !important; }
+    #sharedQuoteView #sqvMount{ border:none; padding:0; max-width:none; }
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  }
+</style>
 </head>
 <body>
+
+<div id="sharedQuoteView">
+  <div class="sqv-wrap">
+    <div class="sqv-top">
+      <div class="sqv-brand">
+        <div class="sqv-mark"><svg viewBox="0 0 120 120" width="33" height="33"><polygon points="21.6,25.8 98.3,25.8 106.9,45.0 30.2,45.0" fill="#fff"/><polygon points="57.9,45.0 79.2,45.0 100.5,94.2 79.2,94.2" fill="#fff"/></svg></div>
+        <span class="sqv-word">TRYLA<span style="font-size:0.4em;vertical-align:super;">&reg;</span></span>
+      </div>
+      <div class="sqv-actions">
+        <button class="sqv-btn primary" id="sqvPrintBtn" type="button">Descargar / Imprimir PDF</button>
+        <a class="sqv-btn" href="/">Ir al sitio</a>
+      </div>
+    </div>
+    <div id="sqvMount">
+      <div class="sqv-loading">Cargando cotizacion...</div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+  var qs = new URLSearchParams(location.search);
+  var quoteId = qs.get("quote");
+  if (!quoteId) return;
+
+  document.body.classList.add("quote-view-mode");
+  document.title = "Cotizacion — Tryla";
+
+  var mount = document.getElementById("sqvMount");
+  var printBtn = document.getElementById("sqvPrintBtn");
+  if (printBtn) printBtn.addEventListener("click", function () { window.print(); });
+
+  var SUPABASE_URL = "https://dcuescldzrgcppubcoxq.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_Ov7JqL4vOjjfkwDDD2DySg_I7huP9FH";
+
+  if (typeof supabase === "undefined") {
+    mount.innerHTML = '<div class="sqv-error">No se pudo cargar la cotizacion. Intenta de nuevo mas tarde.</div>';
+    return;
+  }
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sb.from("shared_quotes").select("doc_html").eq("id", quoteId).maybeSingle()
+    .then(function (res) {
+      if (res.error || !res.data) {
+        mount.innerHTML = '<div class="sqv-error">Esta cotizacion ya no esta disponible.</div>';
+        return;
+      }
+      mount.innerHTML = res.data.doc_html;
+    })
+    .catch(function () {
+      mount.innerHTML = '<div class="sqv-error">No se pudo cargar la cotizacion. Intenta de nuevo mas tarde.</div>';
+    });
+})();
+</script>
 
 <nav>
   <div class="nav-logo">
     <div class="nav-mark">
-      <svg viewBox="0 0 120 120" width="22" height="22">
-        <polygon points="24,28 96,28 104,46 32,46" fill="#fff"/>
-        <polygon points="58,46 78,46 98,92 78,92" fill="#fff"/>
+      <svg viewBox="0 0 120 120" width="36" height="36">
+        <polygon points="21.6,25.8 98.3,25.8 106.9,45.0 30.2,45.0" fill="#fff"/>
+        <polygon points="57.9,45.0 79.2,45.0 100.5,94.2 79.2,94.2" fill="#fff"/>
       </svg>
     </div>
     <div>
-      <div class="brand">TRYLA</div>
+      <div class="brand">TRYLA<span style="font-size:0.4em;vertical-align:super;">&reg;</span></div>
     </div>
   </div>
   <div class="nav-links">
@@ -1001,7 +1107,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
           </div>
           <div class="info-item" style="margin-top:17px;">
             <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></div>
-            <div><div class="info-label">Email</div><div class="info-value">marceloramosch@gmail.com</div></div>
+            <div><div class="info-label">Email</div><div class="info-value">marcelo.ramos@thetryla.com</div></div>
           </div>
           <div class="info-item" style="margin-top:17px;">
             <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
@@ -1022,12 +1128,12 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
     <div class="footer-brand">
       <div class="logo-row">
         <div class="nav-mark" style="width:32px;height:32px;">
-          <svg viewBox="0 0 120 120" width="18" height="18">
-            <polygon points="24,28 96,28 104,46 32,46" fill="#fff"/>
-            <polygon points="58,46 78,46 98,92 78,92" fill="#fff"/>
+          <svg viewBox="0 0 120 120" width="31" height="31">
+            <polygon points="21.6,25.8 98.3,25.8 106.9,45.0 30.2,45.0" fill="#fff"/>
+            <polygon points="57.9,45.0 79.2,45.0 100.5,94.2 79.2,94.2" fill="#fff"/>
           </svg>
         </div>
-        <div class="brand">TRYLA</div>
+        <div class="brand">TRYLA<span style="font-size:0.4em;vertical-align:super;">&reg;</span></div>
       </div>
       <p>Food trailers built like performance equipment. Delivered across the United States.</p>
     </div>
@@ -1043,7 +1149,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
     <div class="footer-col">
       <h4>Contact</h4>
       <a href="tel:+16452353186">+1 (645) 235-3186</a>
-      <a href="mailto:marceloramosch@gmail.com">marceloramosch@gmail.com</a>
+      <a href="mailto:marcelo.ramos@thetryla.com">marcelo.ramos@thetryla.com</a>
     </div>
     <div class="footer-col">
       <h4>Dealership</h4>
