@@ -97,13 +97,20 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .nav-links a{font-size:13px;font-weight:700;color:var(--text2);padding:9px 14px;border-radius:7px;transition:.2s;}
 .nav-links a:hover{color:var(--text);background:var(--surface2);}
 .nav-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.nav-call-btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(120deg,var(--accent) 0%,var(--accent-light) 50%,var(--accent) 100%);background-size:200% 100%;color:#fff;font-weight:800;font-size:13px;letter-spacing:.3px;padding:10px 16px;border-radius:999px;text-decoration:none;box-shadow:0 6px 18px rgba(91,84,255,.35);animation:callPulse 2s ease-in-out infinite;white-space:nowrap;}
+.nav-call-btn:hover{filter:brightness(1.08);}
+.nav-call-btn .call-icon{display:inline-block;animation:callRing 1.2s ease-in-out infinite;}
+@keyframes callPulse{0%,100%{box-shadow:0 6px 18px rgba(91,84,255,.35);}50%{box-shadow:0 6px 26px rgba(91,84,255,.65);}}
+@keyframes callRing{0%,100%{transform:rotate(0deg);}20%{transform:rotate(-15deg);}40%{transform:rotate(12deg);}60%{transform:rotate(-8deg);}80%{transform:rotate(5deg);}}
+@media(prefers-reduced-motion:reduce){.nav-call-btn,.nav-call-btn .call-icon{animation:none !important;}}
+.mobile-menu .nav-call-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;}
 .hamburger{display:none;flex-direction:column;gap:5px;padding:9px;border:1px solid var(--border);border-radius:7px;background:var(--surface);}
 .hamburger span{display:block;width:20px;height:2px;background:var(--text2);border-radius:2px;}
 .mobile-menu{position:fixed;top:72px;left:0;right:0;background:var(--menu-bg);border-bottom:1px solid var(--border);padding:16px 24px;flex-direction:column;gap:4px;z-index:99;opacity:0;transform:translateY(-10px);pointer-events:none;transition:.3s ease;display:flex;}
 .mobile-menu a{display:block;padding:13px;font-weight:700;font-size:14px;color:var(--text2);border-radius:7px;}
 .mobile-menu.open{opacity:1;transform:none;pointer-events:auto;}
 @media(max-width:860px){.nav-links{display:none;}.hamburger{display:flex;}}
-@media(max-width:480px){.nav-actions .btn-primary{display:none;}}
+@media(max-width:480px){.nav-actions .btn-primary{display:none;}.nav-actions .nav-call-btn .call-label{display:none;}.nav-actions .nav-call-btn{padding:10px;}}
 
 /* HERO */
 #home{
@@ -627,11 +634,13 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
       <svg class="moon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg class="sun" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
     </button>
+    <a href="tel:+16452353186" class="nav-call-btn"><span class="call-icon">📞</span><span class="call-label">Call Now</span></a>
     <a href="#quote" class="btn btn-primary" style="padding:10px 19px;font-size:13px;">Get a Quote</a>
     <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
+  <a href="tel:+16452353186" class="nav-call-btn"><span class="call-icon">📞</span><span class="call-label">Call Now: +1 (645) 235-3186</span></a>
   <a href="#quote" class="btn btn-primary" style="justify-content:center;margin-bottom:8px;">Get a Quote</a>
   <a href="#home">Home</a>
   <a href="#porque">Why Tryla</a>
