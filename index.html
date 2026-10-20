@@ -336,13 +336,21 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .qb-preview-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);}
 .qb-photo-wrap{max-width:320px;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface);}
 .qb-preview-stage{width:100%;height:auto;display:block;}
-.qb-palette{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;}
-.qb-swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;position:relative;transition:transform .15s ease,border-color .15s ease;flex-shrink:0;}
-.qb-swatch:hover{transform:scale(1.1);}
-.qb-swatch.sel{border-color:var(--accent-light);box-shadow:0 0 0 2px var(--surface2),0 0 0 4px var(--accent-light);}
-.qb-swatch.sel::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);}
-.qb-swatch-orig{background:repeating-conic-gradient(#2a2f40 0% 25%, #1a1e2a 0% 50%) 0 0/10px 10px;}
-.qb-palette-label{font-size:11.5px;color:var(--text2);margin-right:2px;}
+.qb-colorpicker{margin-top:16px;}
+.qb-cp-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.qb-cp-row:first-child{margin-top:0;}
+.qb-cp-label{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text2);text-transform:uppercase;width:44px;flex-shrink:0;}
+.qb-strip{position:relative;flex:1;height:34px;border-radius:999px;cursor:pointer;touch-action:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+.qb-strip-hue{background:linear-gradient(to right,
+  hsl(0,82%,50%),hsl(60,82%,50%),hsl(120,82%,50%),hsl(180,82%,50%),
+  hsl(240,82%,50%),hsl(300,82%,50%),hsl(360,82%,50%));}
+.qb-thumb{position:absolute;top:50%;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.25);transform:translate(-50%,-50%);pointer-events:none;transition:left .03s linear;}
+.qb-cp-readout{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.qb-cp-swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;}
+.qb-cp-name{font-size:13px;font-weight:700;color:var(--text);flex:1;}
+.qb-cp-reset{font-size:11.5px;font-weight:600;color:var(--text2);background:none;border:1px solid var(--border);border-radius:999px;padding:6px 14px;cursor:pointer;transition:color .15s ease,border-color .15s ease;}
+.qb-cp-reset:hover{color:var(--text);border-color:var(--accent-light);}
+@media(max-width:480px){.qb-cp-label{width:auto;font-size:10px;}}
 .qb-preview-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:14px;}
 .qb-preview-chip{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px 5px 8px;animation:qbChipIn .35s cubic-bezier(.16,1,.3,1);}
 .qb-preview-chip svg{width:14px;height:14px;color:var(--accent-light);flex-shrink:0;}
@@ -851,7 +859,21 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
       <div class="qb-photo-wrap">
         <canvas id="qbPhotoCanvas" class="qb-preview-stage"></canvas>
       </div>
-      <div class="qb-palette" id="qbPalette"></div>
+      <div class="qb-colorpicker">
+        <div class="qb-cp-row">
+          <span class="qb-cp-label">Color</span>
+          <div class="qb-strip qb-strip-hue" id="qbHueStrip"><div class="qb-thumb" id="qbHueThumb"></div></div>
+        </div>
+        <div class="qb-cp-row">
+          <span class="qb-cp-label">Shade</span>
+          <div class="qb-strip" id="qbShadeStrip"><div class="qb-thumb" id="qbShadeThumb"></div></div>
+        </div>
+        <div class="qb-cp-readout">
+          <span class="qb-cp-swatch" id="qbCpSwatch"></span>
+          <span class="qb-cp-name" id="qbCpName">Slide to paint your trailer</span>
+          <button type="button" class="qb-cp-reset" id="qbCpReset">Reset</button>
+        </div>
+      </div>
       <div class="qb-preview-chips" id="qbPreviewChips"><span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span></div>
     </div>
 
@@ -1449,19 +1471,48 @@ if('IntersectionObserver' in window){
       quad: [[54,336],[576,300],[576,810],[54,858]]
     }
   ];
-  var PALETTE = [
-    { id:'orig',   name:'Original (black)', hex:null },
-    { id:'white',  name:'White',            hex:'#E8E9EC' },
-    { id:'silver', name:'Silver',           hex:'#AAACB2' },
-    { id:'red',    name:'Red',              hex:'#C41E1E' },
-    { id:'blue',   name:'Tryla Blue',       hex:'#5B54FF' },
-    { id:'green',  name:'Green',            hex:'#1E7A3C' },
-    { id:'gold',   name:'Gold',             hex:'#C8963A' },
-    { id:'orange', name:'Orange',           hex:'#D9671E' }
-  ];
   var activeModel = TRAILER_MODELS[0];
-  var activeColor = PALETTE[0];
+  // activeColor: null mientras no se ha tocado la tira (foto original tal cual)
+  var activeColor = null; // {hue, light, css, name}
   var photoImg = null, photoCanvas = null, photoCtx = null;
+
+  function hueName(h){
+    var names = [
+      [15,'Red'],[45,'Orange'],[65,'Gold'],[95,'Yellow-green'],[150,'Green'],
+      [195,'Teal'],[230,'Sky blue'],[255,'Blue'],[280,'Indigo'],[320,'Purple'],
+      [345,'Magenta'],[360,'Red']
+    ];
+    for(var i=0;i<names.length;i++) if(h<=names[i][0]) return names[i][1];
+    return 'Red';
+  }
+  function shadeWord(l){
+    if(l<22) return 'dark';
+    if(l>75) return 'light';
+    return '';
+  }
+  function colorLabel(hue,light){
+    var w = shadeWord(light);
+    return (w ? (w.charAt(0).toUpperCase()+w.slice(1)+' ') : '') + hueName(hue);
+  }
+
+  function bindStrip(stripEl, thumbEl, onFrac){
+    function fracFromEvent(e){
+      var rect = stripEl.getBoundingClientRect();
+      var f = (e.clientX - rect.left) / rect.width;
+      return Math.max(0, Math.min(1, f));
+    }
+    function setThumb(f){ thumbEl.style.left = (f*100)+'%'; }
+    stripEl.addEventListener('pointerdown', function(e){
+      stripEl.setPointerCapture(e.pointerId);
+      var f = fracFromEvent(e); setThumb(f); onFrac(f);
+      function move(ev){ var f2=fracFromEvent(ev); setThumb(f2); onFrac(f2); }
+      function up(){ stripEl.removeEventListener('pointermove', move); stripEl.removeEventListener('pointerup', up); stripEl.removeEventListener('pointercancel', up); }
+      stripEl.addEventListener('pointermove', move);
+      stripEl.addEventListener('pointerup', up);
+      stripEl.addEventListener('pointercancel', up);
+    });
+    return setThumb;
+  }
 
   function initVisualizer(){
     photoCanvas = $('qbPhotoCanvas');
@@ -1475,18 +1526,33 @@ if('IntersectionObserver' in window){
     };
     photoImg.src = activeModel.photo;
 
-    var pal = $('qbPalette');
-    pal.innerHTML = '<span class="qb-palette-label">Color:</span>' + PALETTE.map(function(c){
-      var style = c.hex ? ('background:'+c.hex+';') : '';
-      var cls = 'qb-swatch' + (c.id===activeColor.id ? ' sel' : '') + (c.hex ? '' : ' qb-swatch-orig');
-      return '<button type="button" class="'+cls+'" data-id="'+c.id+'" style="'+style+'" title="'+c.name+'" aria-label="'+c.name+'"></button>';
-    }).join('');
-    pal.addEventListener('click', function(e){
-      var b = e.target.closest('.qb-swatch'); if(!b) return;
-      var c = PALETTE.find(function(x){ return x.id===b.dataset.id; });
-      if(!c) return;
-      activeColor = c;
-      pal.querySelectorAll('.qb-swatch').forEach(function(s){ s.classList.toggle('sel', s.dataset.id===c.id); });
+    var hueStrip = $('qbHueStrip'), hueThumb = $('qbHueThumb');
+    var shadeStrip = $('qbShadeStrip'), shadeThumb = $('qbShadeThumb');
+    var swatchEl = $('qbCpSwatch'), nameEl2 = $('qbCpName');
+    var hue = 230, light = 46; // punto de partida si tocan "Shade" antes que "Hue"
+
+    function applyColor(){
+      var css = 'hsl('+Math.round(hue)+',82%,'+Math.round(light)+'%)';
+      activeColor = { hue:hue, light:light, css:css, name: colorLabel(hue,light) };
+      shadeStrip.style.background = 'linear-gradient(to right, #000, hsl('+Math.round(hue)+',82%,50%), #fff)';
+      swatchEl.style.background = css;
+      nameEl2.textContent = activeColor.name;
+      drawTrailer();
+      updatePreview();
+    }
+
+    bindStrip(hueStrip, hueThumb, function(f){ hue = f*360; applyColor(); });
+    bindStrip(shadeStrip, shadeThumb, function(f){ light = f*100; applyColor(); });
+
+    shadeStrip.style.background = 'linear-gradient(to right, #000, hsl('+hue+',82%,50%), #fff)';
+    hueThumb.style.left = '-100%'; shadeThumb.style.left = '-100%';
+    swatchEl.style.background = 'repeating-conic-gradient(#2a2f40 0% 25%, #1a1e2a 0% 50%) 0 0/10px 10px';
+
+    $('qbCpReset').addEventListener('click', function(){
+      activeColor = null;
+      nameEl2.textContent = 'Slide to paint your trailer';
+      swatchEl.style.background = 'repeating-conic-gradient(#2a2f40 0% 25%, #1a1e2a 0% 50%) 0 0/10px 10px';
+      hueThumb.style.left = '-100%'; shadeThumb.style.left = '-100%';
       drawTrailer();
       updatePreview();
     });
@@ -1497,7 +1563,7 @@ if('IntersectionObserver' in window){
     var w = photoCanvas.width, h = photoCanvas.height;
     photoCtx.clearRect(0,0,w,h);
     photoCtx.drawImage(photoImg, 0, 0, w, h);
-    if(!activeColor.hex) return; // "Original" -- deja la foto tal cual
+    if(!activeColor) return; // sin tocar la tira -- foto original tal cual
 
     var quad = activeModel.quad;
     photoCtx.save();
@@ -1513,7 +1579,7 @@ if('IntersectionObserver' in window){
     var y1 = Math.max.apply(null, quad.map(function(p){return p[1];}));
 
     photoCtx.globalCompositeOperation = 'color';
-    photoCtx.fillStyle = activeColor.hex;
+    photoCtx.fillStyle = activeColor.css;
     photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
 
     photoCtx.globalCompositeOperation = 'soft-light';
@@ -1526,7 +1592,7 @@ if('IntersectionObserver' in window){
   function updatePreview(){
     var sz = state.size ? sizeById(state.size) : null;
     var nameEl = $('qbPreviewName');
-    nameEl.innerHTML = activeModel.name + (sz ? (' &middot; '+sz.name) : '') + ' <span style="color:var(--text2);font-weight:400;">&middot; '+activeColor.name+'</span>';
+    nameEl.innerHTML = activeModel.name + (sz ? (' &middot; '+sz.name) : '') + ' <span style="color:var(--text2);font-weight:400;">&middot; '+(activeColor?activeColor.name:'original black')+'</span>';
 
     var chipsBox = $('qbPreviewChips');
     var chipItems = [];
@@ -1542,6 +1608,7 @@ if('IntersectionObserver' in window){
     if(!state.size){ box.innerHTML='<p class="qb-sum-empty">Select a size to see your quote.</p>'; return; }
     var sz=sizeById(state.size);
     var h='<div class="qb-sum-line qb-sum-base"><span>Base '+sz.name+'</span><span>'+fmt(sz.price)+'</span></div>';
+    if(activeColor){ h+='<div class="qb-sum-line"><span>Color</span><span>'+activeColor.name+'</span></div>'; }
     QB_DATA.included.forEach(function(inc){ h+='<div class="qb-sum-line"><span>'+inc.label+'</span><span style="color:#25D366;font-weight:700;">Included</span></div>'; });
     state.equip.forEach(function(id){ var it=itemById(id); if(it){ h+='<div class="qb-sum-line"><span>'+it.name+'</span><span>+'+fmt(it.price)+'</span></div>'; } });
     var sub=subtotal();
@@ -1556,6 +1623,7 @@ if('IntersectionObserver' in window){
     lines.push("Hi Tryla! I'd like to quote a food trailer:");
     lines.push('');
     lines.push('Size: '+(sz?sz.name:'-'));
+    if(activeColor) lines.push('Color: '+activeColor.name);
     lines.push('Includes: Hood, A/C, Sinks, Gas lines, Water pump, Service table');
     if(state.equip.size){ lines.push('Extra equipment:'); state.equip.forEach(function(id){ var it=itemById(id); if(it) lines.push(' • '+it.name+' ('+fmt(it.price)+')'); }); }
     lines.push('');
