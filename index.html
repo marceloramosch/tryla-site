@@ -334,8 +334,20 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .qb-preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
 .qb-preview-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;}
 .qb-preview-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);}
-.qb-photo-wrap{max-width:320px;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface);}
-.qb-preview-stage{width:100%;height:auto;display:block;}
+.qb-photo-wrap{position:relative;max-width:460px;aspect-ratio:4/5;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface);touch-action:pan-y;}
+.qb-photo-bg{position:absolute;top:-24px;left:-24px;width:calc(100% + 48px);height:calc(100% + 48px);object-fit:cover;filter:blur(22px) brightness(.55) saturate(1.1);pointer-events:none;}
+.qb-preview-stage{position:relative;width:100%;height:100%;object-fit:contain;display:block;}
+.qb-photo-btn{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(10,11,16,.55);color:#fff;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0 0 3px;-webkit-tap-highlight-color:transparent;transition:background .2s ease,border-color .2s ease;}
+.qb-photo-btn:hover{background:rgba(91,84,255,.55);border-color:var(--accent);}
+.qb-photo-prev{left:10px;}
+.qb-photo-next{right:10px;}
+.qb-photo-count{position:absolute;right:10px;bottom:10px;font-size:11px;font-weight:700;color:#fff;background:rgba(10,11,16,.6);border-radius:999px;padding:3px 10px;pointer-events:none;}
+.qb-photo-cap{text-align:center;font-size:12.5px;color:var(--text2);margin-top:10px;min-height:18px;}
+.qb-thumbs{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 4px;margin-top:2px;scrollbar-width:thin;}
+.qb-thumb{flex:0 0 auto;width:56px;height:56px;border-radius:9px;border:2px solid var(--border);padding:0;overflow:hidden;cursor:pointer;background:var(--surface);opacity:.72;transition:opacity .2s ease,border-color .2s ease,transform .15s ease;-webkit-tap-highlight-color:transparent;}
+.qb-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.qb-thumb:hover{opacity:1;transform:translateY(-1px);}
+.qb-thumb.sel{opacity:1;border-color:var(--accent-light);}
 .qb-palette{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;}
 .qb-swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;position:relative;transition:transform .15s ease,border-color .15s ease;flex-shrink:0;}
 .qb-swatch:hover{transform:scale(1.1);}
@@ -848,9 +860,15 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
         <span class="qb-preview-tag">Real trailer, your color</span>
         <span class="qb-preview-name" id="qbPreviewName">Model 1</span>
       </div>
-      <div class="qb-photo-wrap">
-        <canvas id="qbPhotoCanvas" class="qb-preview-stage"></canvas>
+      <div class="qb-photo-wrap" id="qbPhotoWrap">
+        <img class="qb-photo-bg" id="qbPhotoBg" alt="" aria-hidden="true">
+        <canvas id="qbPhotoCanvas" class="qb-preview-stage" role="img" aria-label="Trailer preview in your color"></canvas>
+        <button type="button" class="qb-photo-btn qb-photo-prev" id="qbPhotoPrev" aria-label="Previous photo">&#8249;</button>
+        <button type="button" class="qb-photo-btn qb-photo-next" id="qbPhotoNext" aria-label="Next photo">&#8250;</button>
+        <span class="qb-photo-count" id="qbPhotoCount"></span>
       </div>
+      <div class="qb-photo-cap" id="qbPhotoCap"></div>
+      <div class="qb-thumbs" id="qbThumbs"></div>
       <div class="qb-palette" id="qbPalette"></div>
       <div class="qb-preview-chips" id="qbPreviewChips"><span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span></div>
     </div>
@@ -1437,43 +1455,174 @@ if('IntersectionObserver' in window){
   function byId(id){ return document.getElementById(id); }
 
   // ===== Real-photo color visualizer =====
-  // Un trailer real, varios colores: la foto base se recolorea en vivo con
-  // Canvas (blend "color" + un toque de "soft-light" para que blancos/plata
-  // tambien se vean) conservando brillos y sombras reales de la foto -- no
-  // es un dibujo, es la foto de verdad con otro color de pintura.
-  var TRAILER_MODELS = [
-    {
-      id: 'model1', name: 'Model 1', photo: 'assets/trailer-model-1.jpg',
-      // Quad (x,y) de las 4 esquinas del panel pintable en la foto de arriba,
-      // en las dimensiones reales del archivo (900x1200).
-      quad: [[54,336],[576,300],[576,810],[54,858]]
-    }
+  // Fotos reales del trailer, varios colores. Cada foto exterior trae una
+  // MASCARA (assets/trailers/<id>-mask.png) que cubre solo la lamina pintable
+  // (sin llantas, ventanas, puertas, luces ni fondo). El color se aplica pixel
+  // por pixel dentro de la mascara usando la luminosidad real de la foto, asi
+  // se conservan brillos, reflejos y sombras -- tambien sobre laminas negras.
+  // Las fotos de interior no llevan mascara: se muestran tal cual.
+  var SLIDES = [
+    { id:'g1',     name:'Black · City night',        photo:'assets/trailers/g1.jpg',     mask:'assets/trailers/g1-mask.png' },
+    { id:'g2',     name:'Dark gray · Premium',       photo:'assets/trailers/g2.jpg',     mask:'assets/trailers/g2-mask.png' },
+    { id:'model1', name:'Black · Rear door',         photo:'assets/trailers/model1.jpg', mask:'assets/trailers/model1-mask.png' },
+    { id:'g8',     name:'Compact · Porch & A/C',     photo:'assets/trailers/g8.jpg',     mask:'assets/trailers/g8-mask.png' },
+    { id:'g6',     name:'Service windows open',           photo:'assets/trailers/g6.jpg',     mask:'assets/trailers/g6-mask.png' },
+    { id:'g4',     name:'LED lights · Night',        photo:'assets/trailers/g4.jpg',     mask:'assets/trailers/g4-mask.png' },
+    { id:'g3',     name:'Interior · Full kitchen',   photo:'assets/trailers/g3.jpg',     mask:null },
+    { id:'g5',     name:'Interior · Dark finish',    photo:'assets/trailers/g5.jpg',     mask:null },
+    { id:'g7',     name:'Equipment · Griddle & fryer', photo:'assets/trailers/g7.jpg',   mask:null }
   ];
   var PALETTE = [
-    { id:'orig',   name:'Original (black)', hex:null },
-    { id:'white',  name:'White',            hex:'#E8E9EC' },
-    { id:'silver', name:'Silver',           hex:'#AAACB2' },
-    { id:'red',    name:'Red',              hex:'#C41E1E' },
-    { id:'blue',   name:'Tryla Blue',       hex:'#5B54FF' },
-    { id:'green',  name:'Green',            hex:'#1E7A3C' },
-    { id:'gold',   name:'Gold',             hex:'#C8963A' },
-    { id:'orange', name:'Orange',           hex:'#D9671E' }
+    { id:'orig',   name:'Original',   hex:null },
+    { id:'white',  name:'White',      hex:'#E8E9EC' },
+    { id:'silver', name:'Silver',     hex:'#AAACB2' },
+    { id:'red',    name:'Red',        hex:'#C41E1E' },
+    { id:'blue',   name:'Tryla Blue', hex:'#5B54FF' },
+    { id:'green',  name:'Green',      hex:'#1E7A3C' },
+    { id:'gold',   name:'Gold',       hex:'#C8963A' },
+    { id:'orange', name:'Orange',     hex:'#D9671E' }
   ];
-  var activeModel = TRAILER_MODELS[0];
+  var activeModel = { name:'Your trailer' };
   var activeColor = PALETTE[0];
-  var photoImg = null, photoCanvas = null, photoCtx = null;
+  var activeSlide = 0, drawToken = 0;
+  var photoCanvas = null, photoCtx = null;
+  var slideCache = {}, slideOrder = [];   // cache corto: no guardamos las 9 fotos en memoria
+
+  function loadImg(src){
+    return new Promise(function(res, rej){
+      var im = new Image();
+      im.onload = function(){ res(im); };
+      im.onerror = rej;
+      im.src = src;
+    });
+  }
+
+  // Lee foto + mascara una sola vez por foto y precalcula la luminosidad
+  // normalizada (percentiles 3-97) de los pixeles pintables.
+  function prepareSlide(s){
+    if(slideCache[s.id]) return slideCache[s.id];
+    var p = loadImg(s.photo).then(function(img){
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var rec = { w:w, h:h, img:img, paintable:false };
+      if(!s.mask) return rec;
+      return loadImg(s.mask).then(function(mi){
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        var cx = c.getContext('2d', { willReadFrequently:true });
+        cx.drawImage(img, 0, 0);
+        var base = cx.getImageData(0, 0, w, h);
+        cx.clearRect(0, 0, w, h);
+        cx.drawImage(mi, 0, 0, w, h);
+        var md = cx.getImageData(0, 0, w, h).data, bd = base.data;
+        var n = w*h, mask = new Uint8Array(n), lum = new Uint8Array(n), hist = new Uint32Array(256), cnt = 0;
+        var x0 = w, y0 = h, x1 = 0, y1 = 0, i, px, py, y;
+        for(i = 0; i < n; i++){
+          var m = md[i*4]; mask[i] = m;
+          if(m > 8){
+            y = (0.2126*bd[i*4] + 0.7152*bd[i*4+1] + 0.0722*bd[i*4+2]) | 0;
+            lum[i] = y; hist[y]++; cnt++;
+            px = i % w; py = (i / w) | 0;
+            if(px < x0) x0 = px; if(px > x1) x1 = px;
+            if(py < y0) y0 = py; if(py > y1) y1 = py;
+          }
+        }
+        if(!cnt) return rec;
+        var lo = 0, hi = 255, acc = 0, k;
+        for(k = 0; k < 256; k++){ acc += hist[k]; if(acc >= cnt*0.03){ lo = k; break; } }
+        acc = 0;
+        for(k = 255; k >= 0; k--){ acc += hist[k]; if(acc >= cnt*0.03){ hi = k; break; } }
+        if(hi - lo < 24) hi = Math.min(255, lo + 24);
+        var span = hi - lo;
+        for(i = 0; i < n; i++){
+          if(mask[i] > 8){
+            var v = (lum[i] - lo) / span;
+            lum[i] = v < 0 ? 0 : (v > 1 ? 255 : Math.round(v*255));
+          }
+        }
+        rec.base = base; rec.mask = mask; rec.lum = lum; rec.bbox = [x0, y0, x1, y1]; rec.paintable = true;
+        return rec;
+      }).catch(function(){ return rec; });   // sin mascara: se muestra la foto sin recolorear
+    });
+    slideCache[s.id] = p;
+    slideOrder.push(s.id);
+    while(slideOrder.length > 4){ delete slideCache[slideOrder.shift()]; }
+    return p;
+  }
+
+  function paintInto(rec, hex){
+    var tr = parseInt(hex.slice(1,3), 16), tg = parseInt(hex.slice(3,5), 16), tb = parseInt(hex.slice(5,7), 16);
+    var out = photoCtx.createImageData(rec.w, rec.h);
+    var bd = rec.base.data, od = out.data;
+    od.set(bd);
+    var mask = rec.mask, lum = rec.lum, w = rec.w, bb = rec.bbox;
+    for(var y = bb[1]; y <= bb[3]; y++){
+      var row = y*w;
+      for(var x = bb[0]; x <= bb[2]; x++){
+        var i = row + x, m = mask[i];
+        if(m <= 8) continue;
+        var L = lum[i] / 255;
+        var shade = 0.30 + 0.70*Math.pow(L, 0.7);               // pintura: tono base + sombras reales
+        var sp = L > 0.8 ? (L - 0.8) / 0.2 : 0;                   // brillos/reflejos hacia blanco
+        sp = sp*sp*(3 - 2*sp)*0.55;
+        var pr = tr*shade*(1 - sp) + 255*sp;
+        var pg = tg*shade*(1 - sp) + 255*sp;
+        var pb = tb*shade*(1 - sp) + 255*sp;
+        var a = m / 255, j = i*4;
+        od[j]   = bd[j]   + (pr - bd[j])*a;
+        od[j+1] = bd[j+1] + (pg - bd[j+1])*a;
+        od[j+2] = bd[j+2] + (pb - bd[j+2])*a;
+      }
+    }
+    photoCtx.putImageData(out, 0, 0);
+  }
+
+  function drawTrailer(){
+    if(!photoCtx) return;
+    var s = SLIDES[activeSlide], token = ++drawToken;
+    $('qbPhotoBg').src = s.photo;
+    prepareSlide(s).then(function(rec){
+      if(token !== drawToken) return;                              // el usuario ya cambio de foto/color
+      if(photoCanvas.width !== rec.w || photoCanvas.height !== rec.h){ photoCanvas.width = rec.w; photoCanvas.height = rec.h; }
+      if(!rec.paintable || !activeColor.hex){ photoCtx.drawImage(rec.img, 0, 0); }
+      else { paintInto(rec, activeColor.hex); }
+    }).catch(function(){});
+  }
+
+  function updateSlideUI(){
+    var s = SLIDES[activeSlide];
+    $('qbPhotoCount').textContent = (activeSlide + 1) + ' / ' + SLIDES.length;
+    $('qbPhotoCap').textContent = s.name + (s.mask ? '' : ' · color applies to the exterior photos');
+    $('qbThumbs').querySelectorAll('.qb-thumb').forEach(function(t, idx){
+      t.classList.toggle('sel', idx === activeSlide);
+      if(idx === activeSlide && t.scrollIntoView){ try{ t.scrollIntoView({ block:'nearest', inline:'center' }); }catch(e){} }
+    });
+  }
+  function goSlide(i){
+    activeSlide = (i + SLIDES.length) % SLIDES.length;
+    updateSlideUI();
+    drawTrailer();
+  }
 
   function initVisualizer(){
     photoCanvas = $('qbPhotoCanvas');
     if(!photoCanvas) return;
     photoCtx = photoCanvas.getContext('2d');
-    photoImg = new Image();
-    photoImg.onload = function(){
-      photoCanvas.width = photoImg.naturalWidth;
-      photoCanvas.height = photoImg.naturalHeight;
-      drawTrailer();
-    };
-    photoImg.src = activeModel.photo;
+
+    $('qbThumbs').innerHTML = SLIDES.map(function(s, idx){
+      return '<button type="button" class="qb-thumb'+(idx===0?' sel':'')+'" data-i="'+idx+'" aria-label="'+s.name+'"><img src="'+s.photo+'" alt="" loading="lazy" decoding="async"></button>';
+    }).join('');
+    $('qbThumbs').addEventListener('click', function(e){
+      var b = e.target.closest('.qb-thumb'); if(!b) return;
+      goSlide(parseInt(b.dataset.i, 10));
+    });
+    $('qbPhotoPrev').addEventListener('click', function(){ goSlide(activeSlide - 1); });
+    $('qbPhotoNext').addEventListener('click', function(){ goSlide(activeSlide + 1); });
+    var sx = null, wrap = $('qbPhotoWrap');
+    wrap.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, { passive:true });
+    wrap.addEventListener('touchend', function(e){
+      if(sx === null) return;
+      var dx = e.changedTouches[0].clientX - sx; sx = null;
+      if(Math.abs(dx) > 45) goSlide(activeSlide + (dx < 0 ? 1 : -1));
+    }, { passive:true });
 
     var pal = $('qbPalette');
     pal.innerHTML = '<span class="qb-palette-label">Color:</span>' + PALETTE.map(function(c){
@@ -1487,40 +1636,11 @@ if('IntersectionObserver' in window){
       if(!c) return;
       activeColor = c;
       pal.querySelectorAll('.qb-swatch').forEach(function(s){ s.classList.toggle('sel', s.dataset.id===c.id); });
-      drawTrailer();
+      drawTrailer();      // el color queda activo en todas las fotos al navegar
       updatePreview();
     });
-  }
-
-  function drawTrailer(){
-    if(!photoCtx || !photoImg.complete || !photoImg.naturalWidth) return;
-    var w = photoCanvas.width, h = photoCanvas.height;
-    photoCtx.clearRect(0,0,w,h);
-    photoCtx.drawImage(photoImg, 0, 0, w, h);
-    if(!activeColor.hex) return; // "Original" -- deja la foto tal cual
-
-    var quad = activeModel.quad;
-    photoCtx.save();
-    photoCtx.beginPath();
-    photoCtx.moveTo(quad[0][0], quad[0][1]);
-    for(var i=1;i<quad.length;i++) photoCtx.lineTo(quad[i][0], quad[i][1]);
-    photoCtx.closePath();
-    photoCtx.clip();
-
-    var x0 = Math.min.apply(null, quad.map(function(p){return p[0];}));
-    var y0 = Math.min.apply(null, quad.map(function(p){return p[1];}));
-    var x1 = Math.max.apply(null, quad.map(function(p){return p[0];}));
-    var y1 = Math.max.apply(null, quad.map(function(p){return p[1];}));
-
-    photoCtx.globalCompositeOperation = 'color';
-    photoCtx.fillStyle = activeColor.hex;
-    photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
-
-    photoCtx.globalCompositeOperation = 'soft-light';
-    photoCtx.globalAlpha = 0.55;
-    photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
-
-    photoCtx.restore();
+    updateSlideUI();
+    drawTrailer();
   }
 
   function updatePreview(){
