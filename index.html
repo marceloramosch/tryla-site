@@ -334,7 +334,15 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .qb-preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
 .qb-preview-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;}
 .qb-preview-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);}
+.qb-photo-wrap{max-width:320px;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface);}
 .qb-preview-stage{width:100%;height:auto;display:block;}
+.qb-palette{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;}
+.qb-swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;position:relative;transition:transform .15s ease,border-color .15s ease;flex-shrink:0;}
+.qb-swatch:hover{transform:scale(1.1);}
+.qb-swatch.sel{border-color:var(--accent-light);box-shadow:0 0 0 2px var(--surface2),0 0 0 4px var(--accent-light);}
+.qb-swatch.sel::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);}
+.qb-swatch-orig{background:repeating-conic-gradient(#2a2f40 0% 25%, #1a1e2a 0% 50%) 0 0/10px 10px;}
+.qb-palette-label{font-size:11.5px;color:var(--text2);margin-right:2px;}
 .qb-preview-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:14px;}
 .qb-preview-chip{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px 5px 8px;animation:qbChipIn .35s cubic-bezier(.16,1,.3,1);}
 .qb-preview-chip svg{width:14px;height:14px;color:var(--accent-light);flex-shrink:0;}
@@ -837,68 +845,13 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
 
     <div class="qb-preview">
       <div class="qb-preview-top">
-        <span class="qb-preview-tag">Your trailer, live</span>
-        <span class="qb-preview-name" id="qbPreviewName">Pick a size to start</span>
+        <span class="qb-preview-tag">Real trailer, your color</span>
+        <span class="qb-preview-name" id="qbPreviewName">Model 1</span>
       </div>
-      <svg class="qb-preview-stage" id="qbSvg" viewBox="0 0 1000 250" preserveAspectRatio="xMidYMax meet">
-        <defs>
-          <linearGradient id="qbBodyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#5a6a86"/>
-            <stop offset="100%" stop-color="#2e3850"/>
-          </linearGradient>
-          <linearGradient id="qbWrapGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="#5B54FF"/>
-            <stop offset="100%" stop-color="#8b85ff"/>
-          </linearGradient>
-          <filter id="qbGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-
-        <ellipse id="qbSvgShadow" cx="430" cy="216" rx="330" ry="12" fill="#000" opacity=".18"/>
-
-        <!-- hitch -->
-        <path d="M60 165 L140 150 L140 168 L70 180 Z" fill="#8a94a8"/>
-        <circle cx="62" cy="172" r="8" fill="#1a1a1a"/>
-
-        <!-- generator (toggle) -->
-        <g id="qbSvgGen" visibility="hidden">
-          <rect x="30" y="178" width="46" height="30" rx="4" fill="#3a4258" stroke="#1a1a1a" stroke-width="1.5"/>
-          <rect x="36" y="184" width="14" height="8" rx="2" fill="#aab2c6"/>
-          <circle cx="66" cy="200" r="3" fill="#E8A933"/>
-        </g>
-
-        <!-- body -->
-        <rect id="qbSvgBody" x="140" y="60" width="300" height="110" rx="10" fill="url(#qbBodyGrad)" stroke="#1a1526" stroke-width="2"/>
-        <rect id="qbSvgWrap" x="140" y="60" width="300" height="110" rx="10" fill="url(#qbWrapGrad)" stroke="#1a1526" stroke-width="2" visibility="hidden"/>
-        <text id="qbSvgWrapText" x="290" y="160" text-anchor="middle" font-family="'Unbounded',Arial,sans-serif" font-weight="800" font-size="20" fill="#fff" opacity=".9" visibility="hidden">TRYLA</text>
-
-        <!-- roof LED strip -->
-        <rect id="qbSvgLed" x="140" y="57" width="300" height="4" rx="2" fill="#5fd4ff" filter="url(#qbGlow)" visibility="hidden"/>
-
-        <!-- speakers (toggle) -->
-        <g id="qbSvgSpeaker" visibility="hidden">
-          <circle cx="400" cy="52" r="7" fill="#20283a" stroke="#8a94a8" stroke-width="1.5"/>
-          <circle cx="400" cy="52" r="2.5" fill="#8a94a8"/>
-        </g>
-
-        <!-- awning (toggle) -->
-        <path id="qbSvgAwning" d="M168 92 L168 70 L288 58 L288 80 Z" fill="#E8A933" stroke="#1a1526" stroke-width="1.5" visibility="hidden"/>
-
-        <!-- service window -->
-        <rect x="168" y="92" width="120" height="50" rx="4" fill="#eaf2ff" stroke="#1a1526" stroke-width="1.5"/>
-        <line x1="228" y1="92" x2="228" y2="142" stroke="#c7d4ea" stroke-width="2"/>
-        <rect x="168" y="142" width="120" height="7" fill="#aab2c6"/>
-
-        <!-- door -->
-        <rect id="qbSvgDoor" x="390" y="70" width="34" height="90" rx="3" fill="#232a3d" stroke="#1a1526" stroke-width="1.5"/>
-        <circle id="qbSvgDoorKnob" cx="396" cy="118" r="2.5" fill="#aab2c6"/>
-
-        <!-- wheels -->
-        <g id="qbSvgAxle1"><circle cx="330" cy="212" r="24" fill="#15181f"/><circle cx="330" cy="212" r="9" fill="#9aa3b5"/></g>
-        <g id="qbSvgAxle2" visibility="hidden"><circle cx="382" cy="212" r="24" fill="#15181f"/><circle cx="382" cy="212" r="9" fill="#9aa3b5"/></g>
-      </svg>
+      <div class="qb-photo-wrap">
+        <canvas id="qbPhotoCanvas" class="qb-preview-stage"></canvas>
+      </div>
+      <div class="qb-palette" id="qbPalette"></div>
       <div class="qb-preview-chips" id="qbPreviewChips"><span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span></div>
     </div>
 
@@ -1475,67 +1428,114 @@ if('IntersectionObserver' in window){
     prepcooler:'<rect x="4" y="10" width="16" height="9" rx="1"/><path d="M8 10V7h8v3"/>',
     heatcab:   '<rect x="5" y="4" width="14" height="16" rx="1.5"/><path d="M5 12h14"/>',
     floor:     '<path d="M3 12l9-7 9 7-9 7-9-7z"/>',
-    speakers:  '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'
+    speakers:  '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+    wrap:      '<path d="M4 7h16v10H4z"/><path d="M4 12h16"/>',
+    led:       '<path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/>',
+    awning:    '<path d="M3 8l9-5 9 5"/><path d="M3 8v3a2 2 0 0 0 2 2M9 8v3a2 2 0 0 1-4 0M15 8v3a2 2 0 0 0 4 0M21 8v3a2 2 0 0 1-2 2"/>',
+    gen:       '<rect x="3" y="8" width="14" height="9" rx="1.5"/><circle cx="19" cy="15" r="2.5"/>'
   };
+  function byId(id){ return document.getElementById(id); }
+
+  // ===== Real-photo color visualizer =====
+  // Un trailer real, varios colores: la foto base se recolorea en vivo con
+  // Canvas (blend "color" + un toque de "soft-light" para que blancos/plata
+  // tambien se vean) conservando brillos y sombras reales de la foto -- no
+  // es un dibujo, es la foto de verdad con otro color de pintura.
+  var TRAILER_MODELS = [
+    {
+      id: 'model1', name: 'Model 1', photo: 'assets/trailer-model-1.jpg',
+      // Quad (x,y) de las 4 esquinas del panel pintable en la foto de arriba,
+      // en las dimensiones reales del archivo (900x1200).
+      quad: [[54,336],[576,300],[576,810],[54,858]]
+    }
+  ];
+  var PALETTE = [
+    { id:'orig',   name:'Original (black)', hex:null },
+    { id:'white',  name:'White',            hex:'#E8E9EC' },
+    { id:'silver', name:'Silver',           hex:'#AAACB2' },
+    { id:'red',    name:'Red',              hex:'#C41E1E' },
+    { id:'blue',   name:'Tryla Blue',       hex:'#5B54FF' },
+    { id:'green',  name:'Green',            hex:'#1E7A3C' },
+    { id:'gold',   name:'Gold',             hex:'#C8963A' },
+    { id:'orange', name:'Orange',           hex:'#D9671E' }
+  ];
+  var activeModel = TRAILER_MODELS[0];
+  var activeColor = PALETTE[0];
+  var photoImg = null, photoCanvas = null, photoCtx = null;
+
+  function initVisualizer(){
+    photoCanvas = $('qbPhotoCanvas');
+    if(!photoCanvas) return;
+    photoCtx = photoCanvas.getContext('2d');
+    photoImg = new Image();
+    photoImg.onload = function(){
+      photoCanvas.width = photoImg.naturalWidth;
+      photoCanvas.height = photoImg.naturalHeight;
+      drawTrailer();
+    };
+    photoImg.src = activeModel.photo;
+
+    var pal = $('qbPalette');
+    pal.innerHTML = '<span class="qb-palette-label">Color:</span>' + PALETTE.map(function(c){
+      var style = c.hex ? ('background:'+c.hex+';') : '';
+      var cls = 'qb-swatch' + (c.id===activeColor.id ? ' sel' : '') + (c.hex ? '' : ' qb-swatch-orig');
+      return '<button type="button" class="'+cls+'" data-id="'+c.id+'" style="'+style+'" title="'+c.name+'" aria-label="'+c.name+'"></button>';
+    }).join('');
+    pal.addEventListener('click', function(e){
+      var b = e.target.closest('.qb-swatch'); if(!b) return;
+      var c = PALETTE.find(function(x){ return x.id===b.dataset.id; });
+      if(!c) return;
+      activeColor = c;
+      pal.querySelectorAll('.qb-swatch').forEach(function(s){ s.classList.toggle('sel', s.dataset.id===c.id); });
+      drawTrailer();
+      updatePreview();
+    });
+  }
+
+  function drawTrailer(){
+    if(!photoCtx || !photoImg.complete || !photoImg.naturalWidth) return;
+    var w = photoCanvas.width, h = photoCanvas.height;
+    photoCtx.clearRect(0,0,w,h);
+    photoCtx.drawImage(photoImg, 0, 0, w, h);
+    if(!activeColor.hex) return; // "Original" -- deja la foto tal cual
+
+    var quad = activeModel.quad;
+    photoCtx.save();
+    photoCtx.beginPath();
+    photoCtx.moveTo(quad[0][0], quad[0][1]);
+    for(var i=1;i<quad.length;i++) photoCtx.lineTo(quad[i][0], quad[i][1]);
+    photoCtx.closePath();
+    photoCtx.clip();
+
+    var x0 = Math.min.apply(null, quad.map(function(p){return p[0];}));
+    var y0 = Math.min.apply(null, quad.map(function(p){return p[1];}));
+    var x1 = Math.max.apply(null, quad.map(function(p){return p[0];}));
+    var y1 = Math.max.apply(null, quad.map(function(p){return p[1];}));
+
+    photoCtx.globalCompositeOperation = 'color';
+    photoCtx.fillStyle = activeColor.hex;
+    photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
+
+    photoCtx.globalCompositeOperation = 'soft-light';
+    photoCtx.globalAlpha = 0.55;
+    photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
+
+    photoCtx.restore();
+  }
+
   function updatePreview(){
     var sz = state.size ? sizeById(state.size) : null;
     var nameEl = $('qbPreviewName');
-    var svg = $('qbSvg');
-    if(!svg) return;
-
-    if(!sz){
-      nameEl.textContent = 'Pick a size to start';
-      svg.style.opacity = '.45';
-    } else {
-      svg.style.opacity = '1';
-      nameEl.innerHTML = sz.name + ' <span style="color:var(--text2);font-weight:400;">&middot; your trailer so far</span>';
-    }
-
-    var idx = sz ? ALL_SIZES.findIndex(function(s){ return s.id===sz.id; }) : 0;
-    if(idx < 0) idx = 0;
-    var width = 260 + idx * 34; // 8x10 shortest ... 8x30 longest
-    var bodyX = 140, bodyEnd = bodyX + width;
-
-    setAttr('qbSvgBody', { width: width });
-    setAttr('qbSvgWrap', { width: width });
-    setAttr('qbSvgLed', { width: width });
-    setAttr('qbSvgWrapText', { x: bodyX + width / 2 });
-    setAttr('qbSvgShadow', { cx: bodyX + width / 2, rx: 150 + width * 0.6 });
-    setAttr('qbSvgDoor', { x: bodyEnd - 50 });
-    byId('qbSvgDoorKnob').setAttribute('cx', bodyEnd - 44);
-
-    var axle1X = bodyX + width * 0.62;
-    setAttr('qbSvgAxle1', {}); // group, position via children below
-    moveWheel('qbSvgAxle1', axle1X);
-    var isXL = idx >= QB_DATA.sizes.length;
-    toggle('qbSvgAxle2', isXL);
-    if(isXL) moveWheel('qbSvgAxle2', axle1X + 56);
-
-    toggle('qbSvgWrap', state.equip.has('wrap'));
-    toggle('qbSvgWrapText', state.equip.has('wrap'));
-    toggle('qbSvgBody', !state.equip.has('wrap'));
-    toggle('qbSvgLed', state.equip.has('led'));
-    toggle('qbSvgAwning', state.equip.has('awning'));
-    toggle('qbSvgGen', state.equip.has('gen'));
-    toggle('qbSvgSpeaker', state.equip.has('speakers'));
+    nameEl.innerHTML = activeModel.name + (sz ? (' &middot; '+sz.name) : '') + ' <span style="color:var(--text2);font-weight:400;">&middot; '+activeColor.name+'</span>';
 
     var chipsBox = $('qbPreviewChips');
     var chipItems = [];
     state.equip.forEach(function(id){
-      if(id==='wrap'||id==='led'||id==='awning'||id==='gen') return; // ya se ven en el dibujo
       var it = itemById(id);
       var icon = EQUIP_ICONS[id];
       if(it && icon) chipItems.push('<span class="qb-preview-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+icon+'</svg>'+it.name+'</span>');
     });
     chipsBox.innerHTML = chipItems.length ? chipItems.join('') : '<span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span>';
-  }
-  function byId(id){ return document.getElementById(id); }
-  function setAttr(id, attrs){ var el=byId(id); if(!el) return; Object.keys(attrs).forEach(function(k){ el.setAttribute(k, attrs[k]); }); }
-  function toggle(id, show){ var el=byId(id); if(el) el.setAttribute('visibility', show?'visible':'hidden'); }
-  function moveWheel(groupId, cx){
-    var g = byId(groupId); if(!g) return;
-    var circles = g.querySelectorAll('circle');
-    circles.forEach(function(c){ c.setAttribute('cx', cx); });
   }
   function renderSummary(){
     var box=$('qbSummary');
@@ -1589,7 +1589,7 @@ if('IntersectionObserver' in window){
     if(btn) btn.classList.toggle('sel',state.equip.has(id));
     updatePrice(true);
   }
-  renderSizes(); renderEquip(); updatePrice(false); setStep(1);
+  initVisualizer(); renderSizes(); renderEquip(); updatePrice(false); setStep(1);
   $('qbSizeGrid').addEventListener('click', function(e){ var b=e.target.closest('.qb-size'); if(!b) return; if(b.dataset.id==='_xl'){state.xlOpen=true;renderSizes();return;} selectSize(b.dataset.id); });
   $('qbEquip').addEventListener('click', function(e){ var b=e.target.closest('.qb-item'); if(b) toggleEquip(b.dataset.id); });
   $('qbNext').addEventListener('click', next);
