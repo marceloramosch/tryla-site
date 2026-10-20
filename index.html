@@ -328,6 +328,27 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 @keyframes qbIn{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:none;}}
 .qb-step-title{font-family:'Sora',sans-serif;font-size:23px;font-weight:700;color:var(--text);margin-bottom:6px;}
 .qb-step-hint{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.5;}
+
+/* 2D live preview */
+.qb-preview{max-width:1020px;margin:0 auto 20px;background:var(--surface2);border:1px solid var(--border);border-radius:18px;padding:18px 22px 14px;box-shadow:0 14px 44px rgba(0,0,0,.2);}
+.qb-preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+.qb-preview-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;}
+.qb-preview-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);}
+.qb-photo-wrap{max-width:320px;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface);}
+.qb-preview-stage{width:100%;height:auto;display:block;}
+.qb-palette{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;}
+.qb-swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;position:relative;transition:transform .15s ease,border-color .15s ease;flex-shrink:0;}
+.qb-swatch:hover{transform:scale(1.1);}
+.qb-swatch.sel{border-color:var(--accent-light);box-shadow:0 0 0 2px var(--surface2),0 0 0 4px var(--accent-light);}
+.qb-swatch.sel::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);}
+.qb-swatch-orig{background:repeating-conic-gradient(#2a2f40 0% 25%, #1a1e2a 0% 50%) 0 0/10px 10px;}
+.qb-palette-label{font-size:11.5px;color:var(--text2);margin-right:2px;}
+.qb-preview-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:14px;}
+.qb-preview-chip{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px 5px 8px;animation:qbChipIn .35s cubic-bezier(.16,1,.3,1);}
+.qb-preview-chip svg{width:14px;height:14px;color:var(--accent-light);flex-shrink:0;}
+@keyframes qbChipIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:none;}}
+.qb-preview-empty{font-size:12.5px;color:var(--text2);}
+@media(max-width:560px){.qb-preview{padding:14px 16px 12px;}}
 .qb-size-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 @media(max-width:560px){.qb-size-grid{grid-template-columns:1fr 1fr;}}
 .qb-size{position:relative;text-align:left;background:var(--ink);border:2px solid var(--border);border-radius:13px;padding:16px 15px;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),border-color .2s ease,background .2s ease,box-shadow .25s ease;-webkit-tap-highlight-color:transparent;}
@@ -767,7 +788,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
   <div class="container center reveal">
     <div class="tag">WHY TRYLA</div>
     <h2 class="section-title">We don't just sell you a trailer.<br>It's a business to grow.</h2>
-    <p class="section-sub">We build every unit to the same standard behind Nova — just packaged here with a sharper, more technical identity for operators who want their rig to look as sharp as it runs.</p>
+    <p class="section-sub">We build every unit to one standard — packaged with a sharper, more technical identity for operators who want their rig to look as sharp as it runs.</p>
   </div>
   <div class="container">
     <div class="why-grid reveal-stagger">
@@ -820,6 +841,18 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
         <span class="qb-step-label" data-step="2">2 · Equipment</span>
         <span class="qb-step-label" data-step="3">3 · Your quote</span>
       </div>
+    </div>
+
+    <div class="qb-preview">
+      <div class="qb-preview-top">
+        <span class="qb-preview-tag">Real trailer, your color</span>
+        <span class="qb-preview-name" id="qbPreviewName">Model 1</span>
+      </div>
+      <div class="qb-photo-wrap">
+        <canvas id="qbPhotoCanvas" class="qb-preview-stage"></canvas>
+      </div>
+      <div class="qb-palette" id="qbPalette"></div>
+      <div class="qb-preview-chips" id="qbPreviewChips"><span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span></div>
     </div>
 
     <div class="qb-layout">
@@ -878,7 +911,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
   <div class="container center reveal">
     <div class="tag">TRAILERS</div>
     <h2 class="section-title">Delivered trailers</h2>
-    <p class="section-sub">Real units built by the same team behind Tryla — the quality that already backs Nova, now under this identity.</p>
+    <p class="section-sub">Real units built by the Tryla team — the quality we stand behind on every trailer.</p>
   </div>
   <div class="container">
     <div class="gallery-grid reveal-stagger">
@@ -922,7 +955,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
   <div class="container center reveal">
     <div class="tag">LOGISTICS</div>
     <h2 class="section-title">Your trailer, insured to your door</h2>
-    <p class="section-sub">Tryla ships through the same logistics network behind Nova — insured delivery already completed in 15+ states, from New York to California, from Chicago to Miami, and as far as the Bahamas.</p>
+    <p class="section-sub">Tryla ships through an established logistics network — insured delivery already completed in 15+ states, from New York to California, from Chicago to Miami, and as far as the Bahamas.</p>
   </div>
   <div class="container">
     <div class="shipping-grid">
@@ -1040,7 +1073,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
   <div class="container center reveal">
     <div class="tag">FINANCING</div>
     <h2 class="section-title" style="color:#fff;">Don't let money stop your start</h2>
-    <p class="section-sub">Same commercial-equipment financing partners that back Nova — available for Tryla too.</p>
+    <p class="section-sub">Commercial-equipment financing partners, ready to work with Tryla buyers.</p>
   </div>
   <div class="container">
     <div class="finance-grid reveal-stagger">
@@ -1083,7 +1116,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
       <div>
         <div class="tag">WHO'S BEHIND IT</div>
         <h3>Marcelo Ramos Schiaffino</h3>
-        <p>Tryla comes from the same operation that builds Nova's trailers — the difference is the identity: built for operators who want their equipment to carry a sharper, higher-performance look. You're buying from a person, not a logo.</p>
+        <p>Tryla is built for operators who want their equipment to carry a sharper, higher-performance look. You're buying from a person, not a logo.</p>
       </div>
     </div>
   </div>
@@ -1096,17 +1129,19 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
       <h2 class="section-title">Let's start with a conversation.</h2>
     </div>
     <div class="contact-grid reveal">
-      <form class="contact-form">
+      <form class="contact-form" id="contactForm">
+        <input type="text" id="cfWebsite" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
         <div class="form-row">
-          <div class="form-field"><label>Name</label><input type="text" placeholder="Your name"></div>
-          <div class="form-field"><label>Phone</label><input type="tel" placeholder="(xxx) xxx-xxxx"></div>
+          <div class="form-field"><label>Name</label><input type="text" id="cfName" placeholder="Your name"></div>
+          <div class="form-field"><label>Phone</label><input type="tel" id="cfPhone" placeholder="(xxx) xxx-xxxx"></div>
         </div>
-        <div class="form-field"><label>Email</label><input type="email" placeholder="you@email.com"></div>
+        <div class="form-field"><label>Email</label><input type="email" id="cfEmail" placeholder="you@email.com"></div>
         <div class="form-field"><label>Size of interest</label>
-          <select><option>8' – 10'</option><option>12' – 16'</option><option>20' – 24'</option><option>28' – 30'</option><option>Not sure yet</option></select>
+          <select id="cfSize"><option>8' – 10'</option><option>12' – 16'</option><option>20' – 24'</option><option>28' – 30'</option><option>Not sure yet</option></select>
         </div>
-        <div class="form-field"><label>Message</label><textarea rows="4" placeholder="Tell us about your project"></textarea></div>
-        <button type="button" class="btn btn-primary" style="width:100%;justify-content:center;">Send</button>
+        <div class="form-field"><label>Message</label><textarea rows="4" id="cfMessage" placeholder="Tell us about your project"></textarea></div>
+        <div id="cfNote" style="font-size:13px;color:var(--text-2,#7c8aa6);min-height:18px;margin-top:-4px;"></div>
+        <button type="button" class="btn btn-primary" id="cfSend" style="width:100%;justify-content:center;">Send</button>
       </form>
       <div class="contact-info">
         <div>
@@ -1377,6 +1412,130 @@ if('IntersectionObserver' in window){
     $('qbMiniSize').innerHTML = 'Size <b>'+(sz?sz.name:'—')+'</b>';
     $('qbMiniCount').innerHTML = 'Equipment <b>'+state.equip.size+' items</b>';
     if(pulse){ var c=document.querySelector('.qb-price-card'); if(c){ c.classList.remove('qb-pulse'); void c.offsetWidth; c.classList.add('qb-pulse'); } }
+    updatePreview();
+  }
+
+  var ALL_SIZES = QB_DATA.sizes.concat(QB_DATA.sizesXL);
+  var EQUIP_ICONS = {
+    flattop:   '<path d="M3 17h18M5 17V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8"/>',
+    fryer:     '<path d="M6 10h12v9H6z"/><path d="M9 10V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5"/>',
+    range:     '<circle cx="8" cy="9" r="2.3"/><circle cx="16" cy="9" r="2.3"/><rect x="4" y="15" width="16" height="5" rx="1"/>',
+    charbroil: '<rect x="4" y="9" width="16" height="10" rx="1"/><path d="M8 9V6M12 9V6M16 9V6"/>',
+    pizzaoven: '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 12h18"/>',
+    steam:     '<rect x="4" y="11" width="16" height="8" rx="1"/><path d="M8 11V8h8v3"/>',
+    fridge:    '<rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M6 10h12"/>',
+    freezer:   '<rect x="4" y="7" width="16" height="12" rx="1.5"/><path d="M12 7v12M4 13h16"/>',
+    prepcooler:'<rect x="4" y="10" width="16" height="9" rx="1"/><path d="M8 10V7h8v3"/>',
+    heatcab:   '<rect x="5" y="4" width="14" height="16" rx="1.5"/><path d="M5 12h14"/>',
+    floor:     '<path d="M3 12l9-7 9 7-9 7-9-7z"/>',
+    speakers:  '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+    wrap:      '<path d="M4 7h16v10H4z"/><path d="M4 12h16"/>',
+    led:       '<path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/>',
+    awning:    '<path d="M3 8l9-5 9 5"/><path d="M3 8v3a2 2 0 0 0 2 2M9 8v3a2 2 0 0 1-4 0M15 8v3a2 2 0 0 0 4 0M21 8v3a2 2 0 0 1-2 2"/>',
+    gen:       '<rect x="3" y="8" width="14" height="9" rx="1.5"/><circle cx="19" cy="15" r="2.5"/>'
+  };
+  function byId(id){ return document.getElementById(id); }
+
+  // ===== Real-photo color visualizer =====
+  // Un trailer real, varios colores: la foto base se recolorea en vivo con
+  // Canvas (blend "color" + un toque de "soft-light" para que blancos/plata
+  // tambien se vean) conservando brillos y sombras reales de la foto -- no
+  // es un dibujo, es la foto de verdad con otro color de pintura.
+  var TRAILER_MODELS = [
+    {
+      id: 'model1', name: 'Model 1', photo: 'assets/trailer-model-1.jpg',
+      // Quad (x,y) de las 4 esquinas del panel pintable en la foto de arriba,
+      // en las dimensiones reales del archivo (900x1200).
+      quad: [[54,336],[576,300],[576,810],[54,858]]
+    }
+  ];
+  var PALETTE = [
+    { id:'orig',   name:'Original (black)', hex:null },
+    { id:'white',  name:'White',            hex:'#E8E9EC' },
+    { id:'silver', name:'Silver',           hex:'#AAACB2' },
+    { id:'red',    name:'Red',              hex:'#C41E1E' },
+    { id:'blue',   name:'Tryla Blue',       hex:'#5B54FF' },
+    { id:'green',  name:'Green',            hex:'#1E7A3C' },
+    { id:'gold',   name:'Gold',             hex:'#C8963A' },
+    { id:'orange', name:'Orange',           hex:'#D9671E' }
+  ];
+  var activeModel = TRAILER_MODELS[0];
+  var activeColor = PALETTE[0];
+  var photoImg = null, photoCanvas = null, photoCtx = null;
+
+  function initVisualizer(){
+    photoCanvas = $('qbPhotoCanvas');
+    if(!photoCanvas) return;
+    photoCtx = photoCanvas.getContext('2d');
+    photoImg = new Image();
+    photoImg.onload = function(){
+      photoCanvas.width = photoImg.naturalWidth;
+      photoCanvas.height = photoImg.naturalHeight;
+      drawTrailer();
+    };
+    photoImg.src = activeModel.photo;
+
+    var pal = $('qbPalette');
+    pal.innerHTML = '<span class="qb-palette-label">Color:</span>' + PALETTE.map(function(c){
+      var style = c.hex ? ('background:'+c.hex+';') : '';
+      var cls = 'qb-swatch' + (c.id===activeColor.id ? ' sel' : '') + (c.hex ? '' : ' qb-swatch-orig');
+      return '<button type="button" class="'+cls+'" data-id="'+c.id+'" style="'+style+'" title="'+c.name+'" aria-label="'+c.name+'"></button>';
+    }).join('');
+    pal.addEventListener('click', function(e){
+      var b = e.target.closest('.qb-swatch'); if(!b) return;
+      var c = PALETTE.find(function(x){ return x.id===b.dataset.id; });
+      if(!c) return;
+      activeColor = c;
+      pal.querySelectorAll('.qb-swatch').forEach(function(s){ s.classList.toggle('sel', s.dataset.id===c.id); });
+      drawTrailer();
+      updatePreview();
+    });
+  }
+
+  function drawTrailer(){
+    if(!photoCtx || !photoImg.complete || !photoImg.naturalWidth) return;
+    var w = photoCanvas.width, h = photoCanvas.height;
+    photoCtx.clearRect(0,0,w,h);
+    photoCtx.drawImage(photoImg, 0, 0, w, h);
+    if(!activeColor.hex) return; // "Original" -- deja la foto tal cual
+
+    var quad = activeModel.quad;
+    photoCtx.save();
+    photoCtx.beginPath();
+    photoCtx.moveTo(quad[0][0], quad[0][1]);
+    for(var i=1;i<quad.length;i++) photoCtx.lineTo(quad[i][0], quad[i][1]);
+    photoCtx.closePath();
+    photoCtx.clip();
+
+    var x0 = Math.min.apply(null, quad.map(function(p){return p[0];}));
+    var y0 = Math.min.apply(null, quad.map(function(p){return p[1];}));
+    var x1 = Math.max.apply(null, quad.map(function(p){return p[0];}));
+    var y1 = Math.max.apply(null, quad.map(function(p){return p[1];}));
+
+    photoCtx.globalCompositeOperation = 'color';
+    photoCtx.fillStyle = activeColor.hex;
+    photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
+
+    photoCtx.globalCompositeOperation = 'soft-light';
+    photoCtx.globalAlpha = 0.55;
+    photoCtx.fillRect(x0, y0, x1-x0, y1-y0);
+
+    photoCtx.restore();
+  }
+
+  function updatePreview(){
+    var sz = state.size ? sizeById(state.size) : null;
+    var nameEl = $('qbPreviewName');
+    nameEl.innerHTML = activeModel.name + (sz ? (' &middot; '+sz.name) : '') + ' <span style="color:var(--text2);font-weight:400;">&middot; '+activeColor.name+'</span>';
+
+    var chipsBox = $('qbPreviewChips');
+    var chipItems = [];
+    state.equip.forEach(function(id){
+      var it = itemById(id);
+      var icon = EQUIP_ICONS[id];
+      if(it && icon) chipItems.push('<span class="qb-preview-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+icon+'</svg>'+it.name+'</span>');
+    });
+    chipsBox.innerHTML = chipItems.length ? chipItems.join('') : '<span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span>';
   }
   function renderSummary(){
     var box=$('qbSummary');
@@ -1430,12 +1589,91 @@ if('IntersectionObserver' in window){
     if(btn) btn.classList.toggle('sel',state.equip.has(id));
     updatePrice(true);
   }
-  renderSizes(); renderEquip(); updatePrice(false); setStep(1);
+  initVisualizer(); renderSizes(); renderEquip(); updatePrice(false); setStep(1);
   $('qbSizeGrid').addEventListener('click', function(e){ var b=e.target.closest('.qb-size'); if(!b) return; if(b.dataset.id==='_xl'){state.xlOpen=true;renderSizes();return;} selectSize(b.dataset.id); });
   $('qbEquip').addEventListener('click', function(e){ var b=e.target.closest('.qb-item'); if(b) toggleEquip(b.dataset.id); });
   $('qbNext').addEventListener('click', next);
   $('qbBack').addEventListener('click', back);
   ['qbName','qbPhone'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input', buildWhatsApp); });
+})();
+</script>
+
+<script>
+(function () {
+  // Edge Function publica (no usa llave anonima ni toca nova_store directo --
+  // ver supabase/functions/submit-lead en tryla-app para el porque).
+  var SUBMIT_LEAD_URL = "https://dcuescldzrgcppubcoxq.supabase.co/functions/v1/submit-lead";
+
+  var form = document.getElementById('contactForm');
+  if (!form) return;
+  var sendBtn = document.getElementById('cfSend');
+  var note = document.getElementById('cfNote');
+
+  function esc(s) { return (s || '').trim(); }
+
+  async function registerInCrm(lead) {
+    try {
+      var res = await fetch(SUBMIT_LEAD_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lead)
+      });
+      var data = await res.json().catch(function () { return {}; });
+      return !!(res.ok && data.ok);
+    } catch (e) {
+      console.error('[contact-form] no se pudo registrar en el CRM', e);
+      return false;
+    }
+  }
+
+  async function handleSend() {
+    var name = esc(document.getElementById('cfName').value);
+    var phone = esc(document.getElementById('cfPhone').value);
+    var email = esc(document.getElementById('cfEmail').value);
+    var size = esc(document.getElementById('cfSize').value);
+    var message = esc(document.getElementById('cfMessage').value);
+    var honeypot = esc((document.getElementById('cfWebsite') || {}).value);
+
+    if (!name || (!phone && !email)) {
+      note.style.color = '#e34948';
+      note.textContent = 'Agrega al menos tu nombre y un telefono o correo.';
+      return;
+    }
+
+    sendBtn.disabled = true;
+    note.style.color = '';
+    note.textContent = 'Enviando...';
+
+    // Abrir WhatsApp/correo YA, dentro del mismo gesto de click -- si se espera
+    // a la respuesta del CRM primero, el navegador bloquea el popup porque ya
+    // no lo considera parte de la interaccion del usuario.
+    if (phone) {
+      var lines = [
+        "Hi Tryla! I'd like to get in touch:",
+        '',
+        'Name: ' + name,
+        'Phone: ' + phone,
+        'Size of interest: ' + size
+      ];
+      if (email) lines.push('Email: ' + email);
+      if (message) { lines.push(''); lines.push(message); }
+      window.open('https://wa.me/16452353186?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+    } else if (email) {
+      // Sin telefono: abre el correo del visitante hacia Tryla con los datos precargados
+      var subject = 'New website inquiry — ' + name;
+      var body = 'Name: ' + name + '\nEmail: ' + email + '\nSize of interest: ' + size + (message ? ('\n\n' + message) : '');
+      window.location.href = 'mailto:marcelo.ramos@thetryla.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    }
+
+    var crmOk = await registerInCrm({ name: name, phone: phone, email: email, size: size, message: message, website: honeypot });
+
+    sendBtn.disabled = false;
+    note.style.color = crmOk ? '#1baf7a' : '#e34948';
+    note.textContent = crmOk ? 'Gracias — te contactaremos pronto.' : 'Se envio, pero no se pudo registrar en el CRM automaticamente.';
+    if (crmOk) form.reset();
+  }
+
+  sendBtn.addEventListener('click', handleSend);
 })();
 </script>
 </body>
