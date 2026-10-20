@@ -564,7 +564,8 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
 .footer-bottom{max-width:1180px;margin:0 auto;border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;}
 .footer-bottom b{color:#fff;}
 
-.scroll-cta{position:fixed;bottom:24px;right:24px;z-index:50;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1CAD5A,#0E6B60);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(28,173,90,.4);border:none;transition:transform .2s ease;}
+.scroll-cta{position:fixed;bottom:24px;right:24px;z-index:50;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1CAD5A,#0E6B60);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(28,173,90,.4);border:none;transition:transform .2s ease,opacity .2s ease;}
+.scroll-cta.qb-dim{opacity:.15;pointer-events:none;transform:scale(.8);}
 .scroll-cta::before{content:'';position:absolute;inset:0;border-radius:50%;background:rgba(28,173,90,.4);z-index:-1;animation:whatsappRing 2.5s ease-in-out infinite;will-change:transform,opacity;}
 .scroll-cta:hover{transform:scale(1.12);}
 .scroll-cta:hover::before{animation:none;opacity:0;}
@@ -2005,6 +2006,7 @@ if('IntersectionObserver' in window){
         e.preventDefault();
         try{ el.setPointerCapture(e.pointerId); }catch(_){}
         el.classList.add('drag', 'jump');
+        var cta = document.querySelector('.scroll-cta'); if(cta) cta.classList.add('qb-dim');
         setTimeout(function(){ el.classList.remove('jump'); }, 230);   // el dedo "salta" suave a donde tocaste
         set(pos(e));
         var hex = ribbonColor(rT, rU);
@@ -2015,6 +2017,7 @@ if('IntersectionObserver' in window){
       function end(e){
         if(!el.classList.contains('drag')) return;
         el.classList.remove('drag');
+        var cta = document.querySelector('.scroll-cta'); if(cta) cta.classList.remove('qb-dim');
         cancelAnimationFrame(liveRaf); liveRaf = 0;
         var hex = ribbonColor(rT, rU);
         commitColor({ id:'custom', name:'Custom '+hex, hex:hex }, 0);   // cuadro final en calidad completa
