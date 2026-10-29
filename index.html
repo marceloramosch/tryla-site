@@ -679,7 +679,13 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
     return;
   }
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  sb.from("shared_quotes").select("doc_html").eq("id", quoteId).maybeSingle()
+  // Lee la cotizacion por RPC (solo devuelve UNA por id); si la RPC aun no esta
+  // desplegada en Supabase, cae a la lectura directa de la tabla.
+  sb.rpc("get_shared_quote", { p_id: quoteId })
+    .then(function (r) {
+      if (!r.error) return { data: (r.data && r.data[0]) || null, error: null };
+      return sb.from("shared_quotes").select("doc_html").eq("id", quoteId).maybeSingle();
+    })
     .then(function (res) {
       if (res.error || !res.data) {
         mount.innerHTML = '<div class="sqv-error">Esta cotizacion ya no esta disponible.</div>';
