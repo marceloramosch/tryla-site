@@ -921,42 +921,8 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
       </div>
     </div>
 
-    <div class="qb-preview">
-      <div class="qb-preview-top">
-        <span class="qb-preview-tag">Real trailer, your color</span>
-        <span class="qb-preview-name" id="qbPreviewName">Model 1</span>
-      </div>
-      <div class="qb-photo-wrap" id="qbPhotoWrap">
-        <img class="qb-photo-bg" id="qbPhotoBg" alt="" aria-hidden="true">
-        <canvas id="qbPhotoCanvas" class="qb-preview-stage" role="img" aria-label="Trailer preview in your color"></canvas>
-        <button type="button" class="qb-photo-btn qb-photo-prev" id="qbPhotoPrev" aria-label="Previous photo">&#8249;</button>
-        <button type="button" class="qb-photo-btn qb-photo-next" id="qbPhotoNext" aria-label="Next photo">&#8250;</button>
-        <span class="qb-photo-count" id="qbPhotoCount"></span>
-      </div>
-      <div class="qb-photo-cap" id="qbPhotoCap"></div>
-      <div class="qb-thumbs" id="qbThumbs"></div>
-      <!-- Personalizador de color desactivado temporalmente (a peticion de Marcelo).
-           Se deja en el DOM (solo oculto) para no tocar el JS del cotizador y poder
-           reactivarlo despues quitando el style="display:none" de este div. -->
-      <div id="qbColorCustomizer" style="display:none;">
-        <div class="qb-finish" id="qbFinish" role="group" aria-label="Paint finish"></div>
-        <div class="qb-color-label" id="qbColorLabel"></div>
-        <div class="qb-ribbon" id="qbRibbon">
-          <div class="qb-ribbon-top"><span>Color ribbon</span><span class="qb-ribbon-hex" id="qbRibbonHex">#------</span></div>
-          <div class="qb-track" id="qbRibbonTrack" role="slider" tabindex="0" aria-label="Color ribbon" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
-            <span class="qb-track-sheen"></span>
-            <span class="qb-rthumb" id="qbRibbonThumb"><span class="qb-rbubble" id="qbRibbonBubble"></span></span>
-          </div>
-          <div class="qb-ribbon-top qb-shade-top"><span>Shade</span><span>Dark &harr; Light</span></div>
-          <div class="qb-track qb-shade" id="qbShadeTrack" role="slider" tabindex="0" aria-label="Color shade" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55">
-            <span class="qb-rthumb qb-rthumb-s" id="qbShadeThumb"></span>
-          </div>
-          <p class="qb-ribbon-hint">Slide your finger along the ribbon &mdash; the trailer repaints live.</p>
-        </div>
-        <div class="qb-palette" id="qbPalette"></div>
-      </div>
-      <div class="qb-preview-chips" id="qbPreviewChips"><span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span></div>
-    </div>
+    <!-- Panel de fotos "Real trailer, your color" (visor de color) removido a peticion de Marcelo: el cotizador queda solo con pasos y precio.
+         El codigo del visor sigue en el script y se desactiva solo si no existe #qbPhotoCanvas; se puede restaurar desde el historial de git. -->
 
     <div class="qb-layout">
       <div class="qb-main">
@@ -2086,9 +2052,10 @@ if('IntersectionObserver' in window){
   function updatePreview(){
     var sz = state.size ? sizeById(state.size) : null;
     var nameEl = $('qbPreviewName');
+    var chipsBox = $('qbPreviewChips');
+    if(!nameEl || !chipsBox) return;   // panel de fotos removido
     nameEl.innerHTML = activeModel.name + (sz ? (' &middot; '+sz.name) : '') ;
 
-    var chipsBox = $('qbPreviewChips');
     var chipItems = [];
     state.equip.forEach(function(id){
       var it = itemById(id);
