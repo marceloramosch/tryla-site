@@ -3,6 +3,16 @@
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://dcuescldzrgcppubcoxq.supabase.co wss://dcuescldzrgcppubcoxq.supabase.co; object-src 'none'; base-uri 'self'">
 <script>
+  // Tema: si el visitante ya eligio uno, se respeta; si no, sigue el modo claro/oscuro de su sistema.
+  (function(){
+    var root = document.documentElement, saved = null;
+    try { saved = localStorage.getItem('tryla-theme'); } catch(e){}
+    var light = saved ? saved === 'light' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches);
+    if (light) root.setAttribute('data-theme','light');
+  })();
+</script>
+<script src="i18n.js"></script>
+<script>
   // Evita que el navegador "recuerde" el scroll de la ultima visita (ej. si
   // quedaste viendo el cotizador) y te deje ahi en vez de arriba en home.
   // Solo aplica si no entraste con un link directo a una seccion (#quote, etc.)
@@ -65,6 +75,10 @@
   color-scheme:light;
 }
 :root[data-theme="light"] .btn-outline{color:var(--accent-dim);border-color:rgba(59,54,214,.35);}
+/* El hero siempre es oscuro (foto nocturna): en tema claro conserva los colores claros del tema oscuro */
+:root[data-theme="light"] #home{--text:#F4F5F7;--text2:#B7BFD1;--steel:#B7BFD1;--accent-dim:#C9C6FF;}
+:root[data-theme="light"] #home .btn-outline{color:#C9C6FF;border-color:rgba(201,198,255,.45);}
+:root[data-theme="light"] #home .btn-outline:hover{background:rgba(201,198,255,.12);border-color:#C9C6FF;}
 :root[data-theme="light"] .btn-outline:hover{background:rgba(59,54,214,.08);border-color:var(--accent-dim);}
 :root[data-theme="light"] .qb-step-label.active,
 :root[data-theme="light"] .qb-step-label.done,
@@ -174,6 +188,15 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 @keyframes heroTitleGrad{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 @keyframes statsShimmer{0%{transform:translateX(-160%);}50%{transform:translateX(220%);}100%{transform:translateX(220%);}}
 @keyframes whatsappRing{0%,100%{transform:scale(1);opacity:.55;}50%{transform:scale(1.45);opacity:0;}}
+
+/* LANGUAGE TOGGLE (EN | ES) */
+.lang-toggle{height:38px;border-radius:9px;border:1px solid var(--border2);background:var(--surface);display:inline-flex;align-items:center;gap:2px;padding:3px;cursor:pointer;flex-shrink:0;font:700 12px 'Barlow',Arial,sans-serif;letter-spacing:.5px;color:var(--text2);transition:border-color .2s,transform .2s;}
+.lang-toggle:hover{border-color:var(--accent);transform:translateY(-1px);}
+.lang-toggle span{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:30px;border-radius:6px;transition:background .2s,color .2s;}
+html:not([lang="es"]) .lang-toggle [data-l="en"],html[lang="es"] .lang-toggle [data-l="es"]{background:var(--accent);color:#fff;}
+@media(max-width:480px){nav{padding:0 12px;gap:10px;}.nav-actions{gap:6px;}.theme-toggle{width:36px;height:36px;}}
+/* En pantallas chicas el boton muestra solo el idioma al que cambia */
+@media(max-width:430px){.lang-toggle{width:36px;height:36px;padding:0;justify-content:center;}.lang-toggle span{display:none;min-width:0;height:auto;background:none !important;color:var(--text);font-size:12px;}html:not([lang="es"]) .lang-toggle [data-l="es"],html[lang="es"] .lang-toggle [data-l="en"]{display:inline-flex;}}
 
 /* THEME TOGGLE */
 .theme-toggle{width:38px;height:38px;border-radius:9px;border:1px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:border-color .2s ease,transform .2s ease;color:var(--text);}
@@ -729,6 +752,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
     <a href="#contacto">Contact</a>
   </div>
   <div class="nav-actions">
+    <button class="lang-toggle" id="langToggle" type="button" aria-label="Español / English" title="Español / English"><span data-l="en">EN</span><span data-l="es">ES</span></button>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle color theme">
       <svg class="moon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg class="sun" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -1320,10 +1344,17 @@ if('IntersectionObserver' in window){
   var stored = null;
   try { stored = localStorage.getItem('tryla-theme'); } catch(e){}
   if(stored === 'light'){ root.setAttribute('data-theme','light'); }
+  // Sin eleccion manual, sigue los cambios de claro/oscuro del sistema
+  if(!stored && window.matchMedia){
+    var mq = matchMedia('(prefers-color-scheme: light)');
+    var follow = function(e){ if(stored) return; if(e.matches){ root.setAttribute('data-theme','light'); } else { root.removeAttribute('data-theme'); } };
+    if(mq.addEventListener) mq.addEventListener('change', follow); else if(mq.addListener) mq.addListener(follow);
+  }
   document.getElementById('themeToggle').addEventListener('click', function(){
     var isLight = root.getAttribute('data-theme') === 'light';
     if(isLight){ root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme','light'); }
     try { localStorage.setItem('tryla-theme', isLight ? 'dark' : 'light'); } catch(e){}
+    stored = isLight ? 'dark' : 'light';
   });
 })();
 
@@ -2081,16 +2112,17 @@ if('IntersectionObserver' in window){
     var name=($('qbName')||{}).value||'';
     var phone=($('qbPhone')||{}).value||'';
     var sub=subtotal(), lines=[];
-    lines.push("Hi Tryla! I'd like to quote a food trailer:");
+    var T = (window.TrylaI18n && window.TrylaI18n.t) || function(x){ return x; };
+    lines.push(T("Hi Tryla! I'd like to quote a food trailer:"));
     lines.push('');
-    lines.push('Size: '+(sz?sz.name:'-'));
-    lines.push('Includes: Hood, A/C, Sinks, Gas lines, Water pump, Service table');
-    if(activeColor.hex) lines.push('Color: '+activeColor.name+' ('+activeFinish.name+' finish)');
-    if(state.equip.size){ lines.push('Extra equipment:'); state.equip.forEach(function(id){ var it=itemById(id); if(it) lines.push(' • '+it.name+' ('+fmt(it.price)+')'); }); }
+    lines.push(T('Size: ')+(sz?sz.name:'-'));
+    lines.push(T('Includes: Hood, A/C, Sinks, Gas lines, Water pump, Service table'));
+    if(activeColor.hex) lines.push(T('Color: ')+activeColor.name+' ('+activeFinish.name+' finish)');
+    if(state.equip.size){ lines.push(T('Extra equipment:')); state.equip.forEach(function(id){ var it=itemById(id); if(it) lines.push(' • '+T(it.name)+' ('+fmt(it.price)+')'); }); }
     lines.push('');
-    lines.push('Estimate: '+fmt(sub)+' – '+fmt(highEstimate(sub))+' USD');
-    if(name) lines.push('Name: '+name);
-    if(phone) lines.push('WhatsApp: '+phone);
+    lines.push(T('Estimate: ')+fmt(sub)+' – '+fmt(highEstimate(sub))+' USD');
+    if(name) lines.push(T('Name: ')+name);
+    if(phone) lines.push(T('WhatsApp: ')+phone);
     var a=$('qbSend'); if(a) a.href='https://wa.me/16452353186?text='+encodeURIComponent(lines.join('\n'));
   }
   function setStep(n, scroll){
@@ -2124,6 +2156,8 @@ if('IntersectionObserver' in window){
   $('qbNext').addEventListener('click', next);
   $('qbBack').addEventListener('click', back);
   ['qbName','qbPhone'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input', buildWhatsApp); });
+  // Al cambiar de idioma, el mensaje de WhatsApp se arma de nuevo en ese idioma
+  document.addEventListener('tryla:langchange', function(){ if(state.step===3) buildWhatsApp(); });
 })();
 </script>
 
@@ -2137,6 +2171,7 @@ if('IntersectionObserver' in window){
   if (!form) return;
   var sendBtn = document.getElementById('cfSend');
   var note = document.getElementById('cfNote');
+  var T = (window.TrylaI18n && window.TrylaI18n.t) || function (x) { return x; };
 
   // Solo limpia entradas del formulario (recorta, quita caracteres de control y limita largo).
   // No escapa HTML a proposito: estos valores van a WhatsApp/correo/JSON, no a innerHTML;
@@ -2168,32 +2203,32 @@ if('IntersectionObserver' in window){
 
     if (!name || (!phone && !email)) {
       note.style.color = '#e34948';
-      note.textContent = 'Agrega al menos tu nombre y un telefono o correo.';
+      note.textContent = T('Add at least your name and a phone or email.');
       return;
     }
 
     sendBtn.disabled = true;
     note.style.color = '';
-    note.textContent = 'Enviando...';
+    note.textContent = T('Sending...');
 
     // Abrir WhatsApp/correo YA, dentro del mismo gesto de click -- si se espera
     // a la respuesta del CRM primero, el navegador bloquea el popup porque ya
     // no lo considera parte de la interaccion del usuario.
     if (phone) {
       var lines = [
-        "Hi Tryla! I'd like to get in touch:",
+        T("Hi Tryla! I'd like to get in touch:"),
         '',
-        'Name: ' + name,
-        'Phone: ' + phone,
-        'Size of interest: ' + size
+        T('Name: ') + name,
+        T('Phone: ') + phone,
+        T('Size of interest: ') + size
       ];
-      if (email) lines.push('Email: ' + email);
+      if (email) lines.push(T('Email: ') + email);
       if (message) { lines.push(''); lines.push(message); }
       window.open('https://wa.me/16452353186?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener,noreferrer');
     } else if (email) {
       // Sin telefono: abre el correo del visitante hacia Tryla con los datos precargados
-      var subject = 'New website inquiry — ' + name;
-      var body = 'Name: ' + name + '\nEmail: ' + email + '\nSize of interest: ' + size + (message ? ('\n\n' + message) : '');
+      var subject = T('New website inquiry — ') + name;
+      var body = T('Name: ') + name + '\n' + T('Email: ') + email + '\n' + T('Size of interest: ') + size + (message ? ('\n\n' + message) : '');
       window.location.href = 'mailto:marcelo.ramos@thetryla.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     }
 
@@ -2201,7 +2236,7 @@ if('IntersectionObserver' in window){
 
     sendBtn.disabled = false;
     note.style.color = crmOk ? '#1baf7a' : '#e34948';
-    note.textContent = crmOk ? 'Gracias — te contactaremos pronto.' : 'Se envio, pero no se pudo registrar en el CRM automaticamente.';
+    note.textContent = crmOk ? T('Thank you — we will contact you soon.') : T("Sent, but it couldn't be logged in our system automatically.");
     if (crmOk) form.reset();
   }
 
