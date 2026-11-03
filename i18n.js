@@ -309,6 +309,8 @@
     'Quick Quote': 'Cotización rápida',
     '— All rights reserved.': '— Todos los derechos reservados.',
     'Made in Dallas, TX': 'Hecho en Dallas, TX',
+    'Terms of Service': 'Términos de servicio',
+    'Service Agreement': 'Contrato de servicio',
     'Tryla — Built to grow': 'Tryla — Hecho para crecer',
 
     // ---- Mensajes de WhatsApp / formulario (se piden con t()) ----
