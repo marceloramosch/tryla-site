@@ -260,6 +260,23 @@ html:not([lang="es"]) .lang-toggle [data-l="en"],html[lang="es"] .lang-toggle [d
 /* En pantallas chicas el boton muestra solo el idioma al que cambia */
 @media(max-width:430px){.lang-toggle{width:36px;height:36px;padding:0;justify-content:center;}.lang-toggle span{display:none;min-width:0;height:auto;background:none !important;color:var(--text);font-size:12px;}html:not([lang="es"]) .lang-toggle [data-l="es"],html[lang="es"] .lang-toggle [data-l="en"]{display:inline-flex;}}
 
+
+/* SOCIAL + GOOGLE RATING */
+.google-badge{display:inline-flex;align-items:center;gap:9px;margin-top:20px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:14px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s;}
+.google-badge:hover{background:rgba(255,255,255,.14);transform:translateY(-1px);}
+.google-badge .stars{color:#FBBC04;letter-spacing:2px;font-size:16px;line-height:1;}
+.google-badge b{font-weight:800;}
+.google-badge .gm{opacity:.75;font-weight:500;text-decoration:underline;text-underline-offset:3px;}
+@media(max-width:860px){.google-badge{margin-left:auto;margin-right:auto;}}
+@media(max-width:480px){.google-badge{font-size:13px;padding:8px 13px;gap:7px;flex-wrap:wrap;justify-content:center;}}
+.social-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.social-row[hidden]{display:none;}
+.social-row a{width:40px;height:40px;border-radius:10px;border:1px solid var(--border2);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;color:var(--text2);transition:border-color .2s,color .2s,transform .2s;}
+.social-row a:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
+.social-row svg{width:19px;height:19px;fill:currentColor;}
+.social-title{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);margin-top:22px;font-weight:700;}
+footer .social-row a{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#c7cbd1;}
+
 /* THEME TOGGLE */
 .theme-toggle{width:38px;height:38px;border-radius:9px;border:1px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:border-color .2s ease,transform .2s ease;color:var(--text);}
 .theme-toggle:hover{border-color:var(--accent);transform:translateY(-1px);}
@@ -851,6 +868,11 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
         <a href="#contacto" class="btn btn-primary">Quote your trailer &rarr;</a>
         <a href="#contacto" class="btn btn-outline">Contact us</a>
       </div>
+      <a class="google-badge" id="googleBadge" href="#" target="_blank" rel="noopener noreferrer" aria-label="Google rating">
+        <span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span><b>5.0</b> on Google</span>
+        <span class="gm">View on Google Maps</span>
+      </a>
     </div>
     <div class="hero-visual">
       <div class="hero-photo">
@@ -1314,6 +1336,8 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
             <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
             <div><div class="info-label">Dealership</div><div class="info-value">1111 Ellenwood St, Dallas, TX 75217</div></div>
           </div>
+          <div class="social-title" data-social-title hidden>Follow us</div>
+          <div class="social-row" data-social></div>
         </div>
         <div class="whatsapp-cta">
           <p>Prefer to talk directly? Message us on WhatsApp.</p>
@@ -1337,6 +1361,7 @@ footer{background:var(--footer-bg);color:rgba(199,203,209,.6);padding:58px 24px 
         <div class="brand">TRYLA<span style="font-size:0.4em;vertical-align:super;">&reg;</span></div>
       </div>
       <p>Food trailers built like performance equipment. Delivered across the United States.</p>
+      <div class="social-row" data-social></div>
     </div>
     <div class="footer-col">
       <h4>Navigation</h4>
@@ -2306,6 +2331,42 @@ if('IntersectionObserver' in window){
   }
 
   sendBtn.addEventListener('click', handleSend);
+})();
+</script>
+<script>
+/* Redes sociales y calificacion de Google.
+   Para activar una red: pega su URL completa abajo. Las que queden vacias no se muestran.
+   googleMaps: pega el enlace de tu ficha (Google Maps > Compartir). Mientras este vacio, abre Maps con la direccion. */
+(function(){
+  var LINKS = {
+    instagram: '',
+    tiktok:    '',
+    facebook:  '',
+    youtube:   '',
+    linkedin:  '',
+    googleMaps: ''
+  };
+  var MAPS_FALLBACK = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Tryla, 1111 Ellenwood St, Dallas, TX 75217');
+  var ICONS = {
+    instagram:'<svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zM17.2 5.8a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1z"/></svg>',
+    tiktok:'<svg viewBox="0 0 24 24"><path d="M16.6 2h-3.2v13.1a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9a6.1 6.1 0 1 0 5.2 6V8.6a7.4 7.4 0 0 0 4.3 1.4V6.8A4.3 4.3 0 0 1 16.6 2z"/></svg>',
+    facebook:'<svg viewBox="0 0 24 24"><path d="M13.5 22v-8.2h2.8l.5-3.3h-3.3V8.4c0-.9.4-1.7 1.8-1.7h1.6V3.8A19 19 0 0 0 14.5 3.7c-2.6 0-4.3 1.6-4.3 4.4v2.4H7.4v3.3h2.8V22h3.3z"/></svg>',
+    youtube:'<svg viewBox="0 0 24 24"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg>',
+    linkedin:'<svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3V9.5zm6.5 0h3.8v1.6h.1c.5-1 1.9-2 3.9-2 4.1 0 4.7 2.7 4.7 6.2V21h-4v-5.1c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.700V21h-4V9.5z"/></svg>'
+  };
+  var NAMES = {instagram:'Instagram',tiktok:'TikTok',facebook:'Facebook',youtube:'YouTube',linkedin:'LinkedIn'};
+  function safe(u){ return /^https:\/\//i.test(u) ? u : ''; }
+  var html = '';
+  Object.keys(NAMES).forEach(function(k){
+    var u = safe(LINKS[k]);
+    if(u) html += '<a href="'+u+'" target="_blank" rel="noopener noreferrer" aria-label="'+NAMES[k]+'">'+ICONS[k]+'</a>';
+  });
+  document.querySelectorAll('[data-social]').forEach(function(el){
+    if(html){ el.innerHTML = html; } else { el.hidden = true; }
+  });
+  if(html){ document.querySelectorAll('[data-social-title]').forEach(function(t){ t.hidden = false; }); }
+  var gb = document.getElementById('googleBadge');
+  if(gb){ gb.href = safe(LINKS.googleMaps) || MAPS_FALLBACK; }
 })();
 </script>
 </body>
