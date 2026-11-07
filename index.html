@@ -1530,17 +1530,27 @@ if('IntersectionObserver' in window){
     ],
     groups: [
       { name:'Kitchen equipment', items:[
-        { id:'flattop', name:'Flat-top grill', price:1800 },
-        { id:'fryer', name:'Double fryer', price:1400 },
-        { id:'range', name:'4-burner range', price:1600 },
-        { id:'charbroil', name:'Charbroiler', price:1500 },
+        { id:'flattop24', icon:'flattop', name:'Flat-top griddle 24 inch', price:600 },
+        { id:'flattop36', icon:'flattop', name:'Flat-top griddle 36 inch', price:800 },
+        { id:'flattop48', icon:'flattop', name:'Flat-top griddle 48 inch', price:1000 },
+        { id:'flattop60', icon:'flattop', name:'Flat-top griddle 60 inch', price:1200 },
+        { id:'fryer', name:'Fryer double basket 40lb', price:1000 },
+        { id:'range2', icon:'range', name:'2-burner range', price:600 },
+        { id:'range4', icon:'range', name:'4-burner range', price:800 },
+        { id:'range6', icon:'range', name:'6-burner range', price:1000 },
+        { id:'range4oven', icon:'range', name:'4-burner range w/oven', price:1400 },
+        { id:'range6oven', icon:'range', name:'6-burner range w/oven', price:1600 },
+        { id:'charbroil24', icon:'charbroil', name:'Charbroiler 24 inch', price:600 },
+        { id:'charbroil36', icon:'charbroil', name:'Charbroiler 36 inch', price:800 },
+        { id:'charbroil48', icon:'charbroil', name:'Charbroiler 48 inch', price:1000 },
         { id:'pizzaoven', name:'Pizza oven (Gozney)', price:2800 },
-        { id:'steam', name:'Steam table / bain-marie', price:1100 }
+        { id:'steam', name:'Steam table / bain-marie', price:1100 },
+        { id:'fss', icon:'fss', name:'Fire Supression System', price:3700 }
       ]},
       { name:'Refrigeration', items:[
-        { id:'fridge', name:'Commercial fridge', price:2200 },
-        { id:'freezer', name:'Freezer', price:1900 },
-        { id:'prepcooler', name:'Prep cooler table', price:2400 },
+        { id:'fridge', name:'Commercial fridge', price:1000 },
+        { id:'freezer', name:'Freezer', price:1200 },
+        { id:'prepcooler', name:'Sandwich Prep Table', price:1400 },
         { id:'heatcab', name:'Heated holding cabinet', price:1800 }
       ]},
       { name:'Branding & extras', items:[
@@ -1622,6 +1632,7 @@ if('IntersectionObserver' in window){
     wrap:      '<path d="M4 7h16v10H4z"/><path d="M4 12h16"/>',
     led:       '<path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/>',
     awning:    '<path d="M3 8l9-5 9 5"/><path d="M3 8v3a2 2 0 0 0 2 2M9 8v3a2 2 0 0 1-4 0M15 8v3a2 2 0 0 0 4 0M21 8v3a2 2 0 0 1-2 2"/>',
+    fss:       '<path d="M12 3c3 4 6 6 6 10a6 6 0 0 1-12 0c0-4 3-6 6-10z"/>',
     gen:       '<rect x="3" y="8" width="14" height="9" rx="1.5"/><circle cx="19" cy="15" r="2.5"/>'
   };
   function byId(id){ return document.getElementById(id); }
@@ -2180,7 +2191,7 @@ if('IntersectionObserver' in window){
     var chipItems = [];
     state.equip.forEach(function(id){
       var it = itemById(id);
-      var icon = EQUIP_ICONS[id];
+      var icon = EQUIP_ICONS[(it && it.icon) || id];
       if(it && icon) chipItems.push('<span class="qb-preview-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+icon+'</svg>'+it.name+'</span>');
     });
     chipsBox.innerHTML = chipItems.length ? chipItems.join('') : '<span class="qb-preview-empty">Add kitchen equipment and extras to see them appear here.</span>';
